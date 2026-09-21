@@ -1,0 +1,222 @@
+# CLAUDE.md — Permanent Project Rules
+
+Portfolio website for **Bhanudeepak "Bhanu" Nagumothu**, Data Engineer.
+Theme: **Premium Grayscale Spider-Inspired 3D Data Engineering Portfolio.**
+
+This file is loaded every session. It holds the rules that do not change. The evolving plan, section specs, component list, and open questions live in [PLANNING.md](PLANNING.md). If the two ever disagree, this file wins for rules; PLANNING.md wins for the current phase and status.
+
+---
+
+## 1. Status and working agreements
+
+- **Current status:** planning approved with amendments (decisions locked in the table below and in PLANNING.md §0). **Phase 1 (foundation) is complete:** local Git repo, Next.js scaffold, folder structure, content skeleton, and assets. No design or visual sections are built yet, nothing is pushed or deployed, and Phase 2 begins only on Bhanu's explicit go-ahead. **Phase 1.5** locked the public contact values and corrected the Git author identity (the repo-local identity is Bhanu's GitHub noreply address; PLANNING.md D28). Nothing is pushed, and pushing still requires Bhanu's explicit approval. The active phase is tracked in PLANNING.md §11.
+- **Work in phases, stop at each gate.** Finish the phase, summarize what changed, list what is still needed from Bhanu, then wait for approval before starting the next phase.
+- **Never do these without explicit approval in chat for that specific action:** `git init` on a remote, pushing anywhere, creating a GitHub repo, connecting GitHub or fetching from the GitHub API, deploying, publishing an artifact, buying/pointing a domain, adding analytics, installing a dependency not already listed in §7.
+- **Locked decisions may be changed only with Bhanu's explicit approval.** If a task seems to require breaking one, stop and ask.
+
+### Locked decisions (approved by Bhanu)
+
+| # | Decision | Where the detail lives |
+|---|---|---|
+| 1 | **Section order:** Hero, About, Experience, Projects, Skills / Tech Stack, Certifications, Education, Leadership & Awards, Recommendations, GitHub / Links, Resume, Contact. Intent: identity first, then professional credibility, then technical proof. | §6; PLANNING §9 |
+| 2 | **Name:** display "Bhanudeepak Nagumothu" prominently; short name "Bhanu" for conversational/supporting copy. | §2 rule 10 |
+| 3 | **Hero positioning (exact):** "Data Engineer building reliable cloud data platforms, pipelines, and automation that turn operational data into trusted systems." No exaggerated seniority, no invented claims. | §2 rule 3 |
+| 4 | **Public contact:** email, phone, and LinkedIn (plus the GitHub profile link on the resume). **Bhanu approved showing the phone number publicly, only in the Contact section,** and it may remain in the downloadable resume. *(Revised in the Phase 1.5 correction; the original decision was "no phone".)* | §2 rule 8 |
+| 5 | **CSU / employer data:** describe the CSU projects only with information already in the resume; publish no internal files, vendor documents, bills, account numbers, meter identifiers, operational screenshots, or confidential information. Architecture visuals are custom, sanitized diagrams. | §2 rules 6 and 9 |
+| 6 | **Portrait:** use the current 400×400 image; grayscale by default, subtle depth, dimensional frame, restrained deep-crimson edge/glow; CSS treatment; source file never edited; no replacement portrait generated. | §4 |
+| 7 | **Recommendations:** data-driven, hidden automatically until approved records exist; never fabricated. | §2 rule 5 |
+| 8 | **Certifications:** never invent IDs, verification URLs, or issue dates; omit unsupplied values cleanly (no placeholders on the live site). | §2 rule 4 |
+| 9 | **GitHub:** integration and featured repositories come later, after the repository and approved project links are confirmed; never invent repository URLs. | §2 rule 4; PLANNING §9, §11 |
+| 10 | **Resume:** single stable path `/resume/bhanu-resume.pdf`, one central config module controls View and Download; replacing the resume means replacing the PDF (or editing one config source). The PDF may keep its phone number (decided in the Phase 1.5 correction). | §6; PLANNING §8 |
+| 11 | **Reusability:** public reusable template; Bhanu-specific content strictly separated from reusable presentation logic. | §6, §9 |
+| 12 | **Visual concept:** "The Web Is the Pipeline" (spider web → network graph → pipeline → connected data systems), sophisticated, abstract, professional, cinematic. No Marvel/Spider-Man logos, film artwork, copyrighted character illustrations, or fan-site aesthetics. | §4 |
+| 13 | **Public contact values (Phase 1.5):** the public professional email and the approved public phone number are set once in `content/site.ts` (`contact.email`, `contact.phone`); the LinkedIn and GitHub profile URLs are set in `content/socials.ts`. The phone appears only in the Contact section. The public resume PDF may contain the phone number. | §2 rule 8; PLANNING §0 |
+- **Ask before deciding when a choice belongs to Bhanu** (what to publish about their employer, contact details, wording of claims about themself). Decide alone on purely technical choices and note the decision.
+- **Commits:** small, one concern each, Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `style:`, `test:`). Commit only when asked. Never commit `reference/`, `.env*` (except `.env.example`), `.DS_Store`, or anything containing secrets or another person's data. **Commit author and committer must be Bhanu's GitHub noreply address, never a personal email.** This repo's local `user.name` and `user.email` are set to that address, and the initial commit was amended to use it (PLANNING.md D28); do not change them to a personal address. Before any push, verify with `git log --format='%an <%ae> | %cn <%ce>'`, and advise enabling GitHub's "Block command line pushes that expose my email" setting. No reflog purge is required (local reflog data is never pushed).
+- **Do not modify files in `reference/`.** They are read-only development material.
+
+## 2. Content accuracy (highest-priority rule)
+
+The resume is the single source of truth for professional facts. Currently that is `reference/Bhanu_Resume.pdf`; once the app exists, the live copy is `public/resume/bhanu-resume.pdf`.
+
+**Never invent** jobs, titles, dates, metrics, technologies, certifications, credential IDs, degrees, awards, project results, recommendations, quotes, GitHub repositories, or links.
+
+Specific rules:
+
+1. **Every metric must trace to the resume.** Store it once in `content/` with a `source` note. Do not derive new percentages or rephrase numbers to sound bigger. Keep qualifiers: "approximately 3 workdays to 5 minutes", "6,854+ records", "20+ campus buildings".
+2. **Respect tense and status.** The CSU Utilities Lakehouse project is written in the present progressive in the resume ("Architecting", "Implementing", "Building"). Present it as **in progress**; do not claim delivered outcomes or metrics for it.
+3. **Use accurate titles and honest positioning.** The current title is "Data Analyst – Utilities Department." The headline "Data Engineer" is approved positioning taken from the resume summary; never relabel a past job title. The approved hero positioning statement is exactly: *"Data Engineer building reliable cloud data platforms, pipelines, and automation that turn operational data into trusted systems."* Do not exaggerate seniority: no "senior", "lead", "principal", "expert", "architect-level", no year counts beyond the resume's "4+ years combined", and no scale or reliability claims ("enterprise-grade", "petabyte", "99.9%") that the resume does not make. Supporting copy may echo the statement but may not strengthen it.
+4. **Missing information is marked, not filled, and omitted cleanly.** Use the `needsInput("reason")` helper in content modules (see PLANNING.md §7). Anything unsupplied, including **certification IDs, verification URLs, issue dates, project links, GitHub repository URLs, and badge images**, is **omitted from the live website**. Never render a placeholder, "TBD", dummy link, or lorem text in production. Never invent repository URLs or link to a repo that Bhanu has not confirmed. `npm run content:check` lists every open item. Do not write plausible-sounding placeholder facts.
+5. **Recommendations/testimonials** are data-driven and appear only from real, **approved** records: real text, author name, role, relationship, and `approved: true` (meaning Bhanu approved publishing it and the author's permission is confirmed). With zero approved records the section does not render and disappears from navigation, the section rail, and structured data. Never fabricate, paraphrase, "improve", or excerpt-and-alter a recommendation.
+6. **No fabricated screenshots, dashboards, or code, and only sanitized architecture visuals.** Architecture diagrams are **custom SVG/React diagrams built specifically for the portfolio** from project data, never screenshots of internal systems. They may depict only components the resume names, connected in the order the resume describes, and are captioned as a simplified illustration. Labels should read as realistic architecture vocabulary (layer names such as Bronze/Silver/Gold, stage names such as Ingest, Validate, Reconcile, and entity names the resume uses such as buildings, meters, bills). Never use real table, column, schema, database, server, workspace, storage-account, or pipeline names, real ID formats, real vendor or building names, or sample rows that resemble real records. A label that asserts a specific implementation detail the resume does not state (for example an orchestration tool, a schedule, or a table name) requires Bhanu's confirmation first. Mock dashboards or synthetic "sample data" screenshots are not planned; do not create them without asking.
+7. **Pronouns:** Bhanu's pronouns have not been provided. Write all site copy in first person ("I build…") or use the name. Never write "he/she/his/her" for Bhanu. Use they/them for anyone else whose pronouns are unknown.
+8. **Public contact and privacy:** the public site shows **email, phone, and LinkedIn** (plus the GitHub profile link that appears on the resume). Bhanu approved showing the phone number publicly and keeping it in the downloadable resume (Phase 1.5 correction). The number is the one printed on the approved resume, never invented or altered, and is stored **once** in `content/site.ts` as `contact.phone`, the **only phone field in the schema**. It is rendered **only in the Contact section**, as a `tel:` link. It does **not** appear in the hero, navigation, footer, README, page metadata, Open Graph data, JSON-LD, or any other content module. `content:check` flags phone-number patterns anywhere except `contact.phone`, and `content.example/` uses a fictional number from a reserved range or none. Any additional placement needs Bhanu's approval. The public email is set once in `content/site.ts`. The resume PDF may keep its phone number; the resume architecture (§6) is unchanged.
+9. **CSU and employer data privacy:** the public portfolio may describe the CSU projects **using only information already present in Bhanu's approved resume.** Never publish or bundle: internal CSU files, vendor documents, utility bills, account numbers, meter identifiers, internal screenshots or exports that contain operational data, or any confidential or sensitive university information. This applies to `public/`, `content/`, alt text, image metadata, Git history, and test fixtures. When unsure whether something is sensitive, leave it out and ask.
+10. **Name usage:** the primary display name is **"Bhanudeepak Nagumothu"** (hero, page title, metadata, footer, JSON-LD `name`). The preferred short name is **"Bhanu"**, used naturally in conversational and supporting copy (About, Contact, calls to action), never as a replacement for the full name in prominent positions. The name is stored once in `content/site.ts` (`full`, `short`, `monogram`).
+
+## 3. The reference portfolio (ZIP)
+
+Used for **inspiration of layout quality, flow, and interaction polish only**. It belongs to a different person and contains that person's personal documents.
+
+- Never copy its text, name, branding, colors, icons, images, certificates, resumes, PDFs, code, or its exact hero composition. Do not import anything from it.
+- Rebuild any pattern from scratch to fit this design system.
+- Its extracted contents must not enter this repo, `public/`, or any commit. Keep it local under `reference/` (gitignored).
+
+## 4. Visual identity
+
+**Concept (locked): "The Web Is the Pipeline."** Spider-web geometry *is* graph/network/pipeline geometry. Spider web → network graph → pipeline → connected data systems. The spider influence is abstract, sophisticated, professional, and cinematic, never fan-site.
+
+**Palette: ~92% grayscale, ~8% deep crimson.**
+
+| Token | Role |
+|---|---|
+| void black | page background |
+| carbon | raised background |
+| graphite | cards, panels |
+| dark steel | borders, dividers, inactive geometry |
+| silver | secondary text, web strands |
+| off-white | primary text, headlines |
+| deep crimson | **only** active/interactive states, focus emphasis, the single node/strand currently "live", primary CTA fill |
+
+Exact hex values and contrast pairings live in PLANNING.md §5. All colors are defined once as design tokens (CSS variables consumed by Tailwind). **No raw hex/rgb values in components.**
+
+**Crimson rules**
+- Never dominant. If a screenshot looks red at a glance, it is wrong.
+- Never for small body text (crimson on void black is ~3.5:1, below AA for small text). Use it as a fill behind off-white text, as a stroke, or a glow.
+- Signals "active", "selected", "the pipeline is here", or the restrained portrait edge accent below. No other decorative use.
+- At most **three** distinct crimson elements in any one viewport, and none may be a large fill. Glows are static (never animated `box-shadow`); at most one crimson element pulses.
+
+**Portrait treatment (locked).** The current approved `bhanu-portrait.png` (400×400) is used for the initial implementation.
+- **Grayscale by default**, via CSS (`filter`, overlay gradients, or an SVG filter). The warm cream background must never appear in color on the page.
+- Subtle depth (layered plates and soft shadow) inside a **dimensional frame** in the site's angular language (chamfered corners, offset back plates, hairline steel borders), plus a **restrained deep-crimson edge/glow accent** (a thin crimson-500 hairline and a low-alpha static glow).
+- **The source file is never edited, re-saved, cropped on disk, or replaced.** Do not generate a replacement portrait or a color-graded derivative asset. Treatment is CSS/SVG at render time.
+- **Never display it larger than ~240 CSS px wide** and never as a full-bleed or background image; do not upscale.
+- No color reveal on hover is planned. Any change to the treatment goes through Bhanu.
+
+**Spider-inspiration guardrails**
+- Allowed: radial/concentric web geometry with slight catenary sag, node-and-edge graphs, angular mask-eye shapes used sparingly as clip-paths or frames, layered depth, cinematic lighting, metallic/graphite surfaces.
+- **Not allowed:** Marvel or Spider-Man logos, wordmarks, or emblems; any spider logo or emblem; literal spiders; copied film artwork, stills, posters, or promotional imagery; copyrighted character illustrations or silhouettes traced from them; Marvel or Spider-Man names in UI copy, metadata, alt text, or the README; red-and-blue suit color references; web-slinging puns; comic halftone or panel layouts; "superhero" language; anything that reads as a fan site. (Marvel and Spider-Man are third-party trademarks and copyrights. This is an inspired, abstract aesthetic, not a fan site.)
+- Web geometry is original and generated by code (see PLANNING.md §5.4); do not import third-party web/spider vector art.
+- The look should read as: cinematic, elegant, premium, technical, sophisticated, recruiter-friendly, memorable.
+
+**Typography:** a dimensional display face for the hero name and section titles, a clean neutral sans for body, a mono for technical labels. Fonts are self-hosted through `next/font`. Final families are confirmed in Phase 1 (PLANNING.md §5). All real text stays real text (never text-in-image).
+
+## 5. Motion and 3D principles
+
+Moderate and elegant. Motion clarifies structure; it is never decoration for its own sake.
+
+**3D comes from** dimensional hero typography, subtle cursor parallax, a layered hero composition, perspective project cards with hover tilt, lighting/shadow depth, smooth modal transitions, and layered web/network geometry. **No heavy 3D models or WebGL** unless a future need is approved and justified.
+
+**Budget rules**
+1. Animate only `transform` and `opacity` (plus `stroke-dashoffset` on small SVGs). Never animate `filter: blur`, `backdrop-filter`, `box-shadow` size, layout properties, or large blurred elements.
+2. At most **one** continuous ambient loop visible at a time. It pauses when off-screen (IntersectionObserver) and when the tab is hidden.
+3. Pointer-driven effects (tilt, parallax, light-follow) run only on `(hover: hover) and (pointer: fine)`, write CSS variables or motion values inside `requestAnimationFrame`, and never trigger React re-renders per mouse move.
+4. Tilt limits: cards ≤ ±8°, hero title ≤ ±5°. Perspective ~900–1200px.
+5. `backdrop-filter` is used on at most a couple of elements per viewport (e.g., the nav). Panels use opaque or gradient graphite instead of glass blur.
+6. Durations: UI feedback 150–250 ms; entrances 500–800 ms; one shared easing curve defined as a token. Stagger sparingly.
+7. Use Framer Motion through `LazyMotion` with `domAnimation` to limit bundle size. Prefer CSS for anything Framer is not needed for.
+8. No autoplay sound or video. No scroll-jacking. No cursor replacement.
+
+**`prefers-reduced-motion: reduce` is a first-class mode**, not an afterthought: no parallax, tilt, marquee, looping animation, or smooth scrolling; entrance animations become instant or a plain fade; the web geometry renders static; modals appear without transforms. Smooth scrolling is enabled only inside `@media (prefers-reduced-motion: no-preference)`.
+
+**Progressive enhancement:** critical text (name, headings, project summaries) is server-rendered and visible without JavaScript and before hydration. Never hide meaningful content behind an animation start state that requires JS to reveal.
+
+## 6. Architecture rules
+
+**Separate content from presentation.** No personal or professional text, numbers, links, or dates inside React components.
+
+- All content lives in `/content` as typed TypeScript modules: `site` (profile, SEO, contact), `navigation`, `resume`, `experience`, `projects`, `skills`, `education`, `certifications`, `awards`, `leadership`, `recommendations`, `socials`, `metrics`. Types live in `src/types/content.ts` and are validated at build time by a script (Zod).
+- All media lives in `/public`. A future user should mostly change only `/content` and `/public`.
+- UI strings that are chrome (e.g., "Skip to content", "Close") are the only text allowed in components, and they live in one `src/lib/ui-strings.ts` so they can be localized or reworded in one place.
+- **Section order is locked** and defined once in `content/navigation.ts`:
+  1. Hero, 2. About, 3. Experience, 4. Projects, 5. Skills / Tech Stack, 6. Certifications, 7. Education, 8. Leadership & Awards, 9. Recommendations, 10. GitHub / Links, 11. Resume, 12. Contact.
+  The order establishes identity first, then professional credibility (Experience, Projects), then technical proof (Skills). Do not reorder without Bhanu's approval. The **proof strip** (resume-sourced metrics) is a band at the foot of the Hero, not a thirteenth section, and has no nav entry.
+- **Sections are data-driven and self-hiding.** A section with no renderable content does not render and does not appear in navigation, the section rail, the sitemap of anchors, or JSON-LD. Expected at launch: **Recommendations is hidden** (no approved records yet); **GitHub / Links** shows only the profile and LinkedIn links that appear on the resume, with its featured-repositories block hidden until Bhanu confirms repositories and approved project links.
+- **Import boundaries (enforced by ESLint):** `content/` imports only types and the `needsInput` helper (`src/lib/needs-input.ts`). Files under `src/` import content only through `@/lib/content` selectors, never via the `@content/*` alias or deep paths. `components/ui` (shadcn primitives) know nothing about Bhanu's content. `components/sections` compose primitives and content.
+- **One resume source.** All "View Resume" and "Download Resume" actions read `content/resume.ts` through one helper and one `<ResumeActions>` component. The filename `bhanu-resume.pdf` and the path `/resume/bhanu-resume.pdf` appear in exactly one place: `content/resume.ts`. Replacing the resume means replacing the PDF file (or, if truly necessary, editing that one config source); it must never require editing any component. Never add a version, date, or personal name to the public filename. See PLANNING.md §8.
+- **Bhanu-specific content vs. reusable presentation stay separated.** Components, hooks, `lib/`, styles, and tests contain no Bhanu-specific strings, links, numbers, or assets. Anything that is "about Bhanu" lives in `content/` and `public/`; anything reusable lives in `src/`. Tests, the design specimen page, and any examples use `content.example/` fixtures, not Bhanu's content.
+- Server Components by default. `"use client"` only for interaction (tilt, modal state, menu, pointer effects) and pushed as far down the tree as possible.
+- Stay **static-export compatible**: no API routes, no server-only runtime features, so the site can deploy to Vercel, Netlify, Cloudflare Pages, or GitHub Pages. Contact is `mailto:` plus copy-to-clipboard, with an optional third-party form endpoint via env var.
+- Generated geometry (the web) comes from a **pure, seeded** function so server and client render identically (no `Math.random()` at render time, no hydration mismatches).
+
+## 7. Tech stack and conventions
+
+**Installed (Phase 1, exact versions pinned, npm):** Next.js 16.3.5 (App Router, Turbopack), React 19.2.8, TypeScript 5.9.3 (strict), Tailwind CSS 4.3.3, ESLint 9.39.5 with `eslint-config-next`.
+
+**Still planned (each installed only in the phase that needs it, after approval):** Framer Motion (`motion`), shadcn/ui (Radix-based) where useful, Zod for content validation, Prettier, custom CSS for bespoke depth effects. Later, in the quality phase: Playwright + axe, Lighthouse CI. Pin exact versions at install time (`.npmrc` sets `save-exact=true`).
+
+**Conventions**
+- TypeScript `strict`; no `any` without a comment justifying it.
+- Tailwind reads design tokens; bespoke effects (extruded type, specular light, web geometry) live in named CSS classes/CSS modules with comments explaining the technique.
+- Components: named exports, one component per file, `PascalCase.tsx`; props typed; small and composable. Hooks in `src/hooks`, prefixed `use`.
+- Match the surrounding code's naming and comment density. Comments explain *why*, not *what*.
+- Add a dependency only with a written reason. Prefer the platform (CSS, IntersectionObserver, `<dialog>`-grade primitives via Radix) over a library. No icon pack sprawl; use one icon set and import icons individually.
+- Use `next/image` for raster images with explicit `width`/`height` and meaningful `alt`; use `next/font` for fonts; no third-party font `<link>`s.
+- Cross-platform paths and no absolute local paths in code or docs.
+
+## 8. Accessibility, performance, SEO (requirements, not aspirations)
+
+**Accessibility (target WCAG 2.2 AA)**
+- Semantic landmarks (`header`, `nav`, `main`, `section` with headings, `footer`), one `<h1>`, logical heading order, skip-to-content link.
+- Everything operable by keyboard with a **visible focus ring** (off-white/silver with a crimson accent; ≥ 3:1 against adjacent colors). Focus is never removed.
+- Modals use an accessible dialog primitive: `role="dialog"`, `aria-modal`, labelled, focus trapped, `Esc` closes, focus returns to the trigger, background scroll locked, deep-linkable and closable with the browser Back button.
+- Body text ≥ 4.5:1, large text/UI ≥ 3:1. **Minimum text size 12px (0.75rem)** for anything meaningful; no sub-12px microcopy.
+- Decorative geometry is `aria-hidden` and `pointer-events: none`. Meaningful diagrams have text alternatives.
+- Mobile menu button exposes `aria-expanded` and `aria-controls`. Touch targets ≥ 44×44 px.
+- Never convey state by color alone (crimson "active" also gets an underline/marker/shape).
+
+**Performance (targets, measured on mobile emulation)**
+- LCP < 2.0 s, INP < 150 ms, CLS < 0.05, Lighthouse ≥ 95 Performance, 100 Accessibility, 100 Best Practices, 100 SEO.
+- First-load JS budget ≈ 170 KB gzipped for the landing route. Anything that threatens it needs justification.
+- Hero is above-the-fold and must not wait on JS to paint. Below-the-fold sections and modals are lazy (`next/dynamic`, `loading="lazy"`); the resume PDF viewer loads only when opened.
+- Images: AVIF/WebP via `next/image`, correct `sizes`, no layout shift. The portrait must never be upscaled (see PLANNING.md §4).
+- No JS whose only job is decoration and that cannot be turned off under reduced motion or data-saver.
+
+**SEO / sharing**
+- Metadata API for title, description, canonical, robots, Open Graph, Twitter card, theme-color; generated `sitemap` and `robots`; JSON-LD `Person` built only from public content fields (name, job title, email, and `sameAs` links to LinkedIn and the GitHub profile; **never a phone number**, which appears only in the Contact section; never a street address); a real OG image.
+- Descriptions are written from resume facts, lead with the full name "Bhanudeepak Nagumothu", and use no pronouns. The approved hero positioning statement is the basis for the meta description.
+
+## 9. Repository hygiene and reusability
+
+This becomes a **public GitHub repo and a reusable template.**
+
+- `reference/` is **gitignored and never deployed.** It contains the reference owner's personal files. `.gitignore` is the first file created in Phase 1, before `git init`.
+- Nothing in `public/` is included by accident. Each asset is added deliberately and listed in `docs/ASSETS.md`. **No internal CSU files, vendor documents, utility bills, or screenshots containing operational data may ever be added to the repo,** not even temporarily (they would live in Git history forever).
+- **GitHub integration is deferred.** Do not add GitHub API fetching, featured-repository data, or "view source" links until Bhanu confirms the repository and the approved project links. Until then the GitHub section uses only the profile URL that appears on the resume.
+- No secrets, tokens, keys, or private URLs anywhere. `.env.example` documents every variable with safe defaults; the site must build with zero env vars set.
+- **MIT license for code.** Bhanu's personal content and assets (`content/`, `public/images`, `public/resume`) are not licensed for reuse; state this plainly in README and a `CONTENT-NOTICE` so forks replace them.
+- A future user customizes by editing `/content` and `/public` and following `docs/CUSTOMIZING.md`. A neutral `content.example/` with placeholder identity ships alongside so the template is usable without Bhanu's data.
+- Docs to ship: README, `docs/CUSTOMIZING.md`, `docs/DEPLOYING.md`, `docs/ARCHITECTURE.md`, `docs/ASSETS.md`.
+- CI (GitHub Actions): install, lint, typecheck, `content:check`, build.
+- Sensible history: one concern per commit, no committed then deleted secrets or third-party files. If anything sensitive is ever committed, rewrite before the first push.
+
+## 10. Definition of done (every change)
+
+- [ ] No content hard-coded in components; new facts added to `/content` with a source.
+- [ ] Nothing invented; anything unknown uses `needsInput()` and is **omitted** on the live site (no placeholders, no invented IDs, dates, URLs, or repos).
+- [ ] The phone number appears only in the Contact section (from `content/site.ts`), and no CSU/vendor/bill/account/meter/operational data appears anywhere in the change.
+- [ ] Section order and hero positioning text match the locked decisions.
+- [ ] No Bhanu-specific strings in components; tests use `content.example/`.
+- [ ] Tokens used; no raw colors; crimson ≤ ~8% and never small text.
+- [ ] Works at 360 px, 768 px, 1280 px, and 1920 px widths; no horizontal scroll.
+- [ ] Fully keyboard-operable; focus visible; screen-reader names correct.
+- [ ] `prefers-reduced-motion` verified; pointer effects gated to fine pointers.
+- [ ] Only compositor-friendly properties animated; no per-frame React re-renders.
+- [ ] Lint, typecheck, `content:check`, and build pass.
+- [ ] No console errors or hydration warnings.
+- [ ] Summarized what changed, what was verified, and what is still needed from Bhanu.
+
+## 11. Commands (filled in during Phase 1)
+
+Package manager: **npm** (Bhanu's Phase 1 instruction; supersedes the earlier pnpm proposal).
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Development server (http://localhost:3000) |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint, including the import-boundary rules |
+| `npm run typecheck` | `next typegen` then `tsc --noEmit` (route types must be generated first) |
+
+Planned, not yet implemented (Phase 2): `npm run content:check`, `npm run resume:check`.
+
+**Framework note:** `next.config.ts` sets `agentRules: false`. Without it, `next dev` appends an agent-instructions block to this file on every run. Do not remove that setting, and if this file ever shows a `nextjs-agent-rules` block, delete it.

@@ -1,0 +1,56 @@
+# =============================================================================
+# Repository hygiene (CLAUDE.md §9). This file is created BEFORE `git init`.
+# =============================================================================
+
+# --- Development-only reference material: NEVER committed, NEVER deployed ----
+# Contains another person's personal files (reference portfolio ZIP) and
+# source documents. See CLAUDE.md §3.
+reference/
+
+# --- Resume PDF gate (CLAUDE.md §2 rule 8, PLANNING.md §8.5) -----------------
+# The resume PDF contains a personal phone number. Whether the PUBLIC PDF
+# includes it is Bhanu's decision, made later. Until then no PDF is tracked, so
+# it cannot reach a pushed repository by accident. Once Bhanu decides, delete
+# the next line and commit public/resume/bhanu-resume.pdf deliberately.
+public/resume/*.pdf
+
+# --- Dependencies and build output -------------------------------------------
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+.next/
+out/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Environment files: never commit secrets (keep the documented example) ---
+.env
+.env.*
+!.env.example
+
+# --- Logs and debug output ---------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- OS and editor noise -----------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# --- Tooling caches and local-only settings ----------------------------------
+.vercel
+.eslintcache
+.claude/settings.local.json
+
+# Playwright MCP scratch output (screenshots, snapshots, console logs)
+.playwright-mcp/
