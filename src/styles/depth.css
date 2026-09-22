@@ -1,0 +1,107 @@
+/**
+ * Surface / depth system (CLAUDE.md §4 "Surfaces, metals, lighting"; Phase 3 Step 4).
+ * "Precision-engineered dark interface," not glassmorphism: opaque graphite gradients,
+ * hairline borders, layered low-alpha shadows, one fixed light direction (top-left)
+ * everywhere. `backdrop-filter` is reserved for the nav (CLAUDE.md §5 budget rule 5)
+ * and is not used here.
+ */
+
+/* ---------------------------------------------------------------------------
+   Panels / cards — the base surface treatment.
+--------------------------------------------------------------------------- */
+
+.surface {
+  background: linear-gradient(155deg, var(--palette-graphite-hi) 0%, var(--palette-graphite-lo) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+    /* top hairline highlight, fixed light from top-left */ 0 20px 60px -20px rgba(0, 0, 0, 0.55);
+}
+
+.surface--elevated {
+  border-color: var(--color-border);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 28px 90px -24px rgba(0, 0, 0, 0.6);
+}
+
+/* Angular language: chamfered corner in place of a rounded one (PLANNING §5.3). */
+.surface--chamfered {
+  border-radius: 0;
+  clip-path: polygon(
+    var(--layout-chamfer) 0,
+    100% 0,
+    100% calc(100% - var(--layout-chamfer)),
+    calc(100% - var(--layout-chamfer)) 100%,
+    0 100%,
+    0 var(--layout-chamfer)
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   Restrained crimson edge/glow — for the single "live" or selected surface.
+   Static only (CLAUDE.md §4: "Glows are static (never animated box-shadow)").
+--------------------------------------------------------------------------- */
+
+.surface--accent-edge {
+  border-color: color-mix(in srgb, var(--color-glow) 45%, transparent);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 0 0 1px color-mix(in srgb, var(--color-glow) 25%, transparent) inset,
+    0 0 32px -4px color-mix(in srgb, var(--color-glow) 35%, transparent),
+    0 28px 90px -24px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------------------------------------------------------------------------
+   Tilt — a bounded, pointer-fine-only hover response (CLAUDE.md §5 budget rule
+   3-4). JS (useTilt) writes --tilt-rx/--tilt-ry/--tilt-tz via rAF; CSS just
+   consumes them, so no per-frame React re-render is ever required.
+--------------------------------------------------------------------------- */
+
+.tilt {
+  --tilt-rx: 0deg;
+  --tilt-ry: 0deg;
+  --tilt-tz: 0px;
+  transform: perspective(1100px) rotateX(var(--tilt-rx)) rotateY(var(--tilt-ry)) translateZ(var(--tilt-tz));
+  transition: transform var(--motion-duration-fast) var(--motion-ease);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Focus ring (CLAUDE.md §8: visible, ≥3:1, never removed). Off-white outer +
+   void gap + crimson-500 inner accent, exactly as PLANNING §5.5 specifies.
+--------------------------------------------------------------------------- */
+
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--palette-offwhite);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--palette-void), 0 0 0 5px var(--color-glow);
+  border-radius: inherit;
+}
+
+/* ---------------------------------------------------------------------------
+   Cinematic grain — one static, cached, low-alpha noise texture (PLANNING
+   §5.1: "one static noise texture at ≤5%"). Pure CSS, no image request.
+--------------------------------------------------------------------------- */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}

@@ -1,1 +1,66 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/depth.css";
+@import "../styles/web.css";
+
+/* ---------------------------------------------------------------------------
+   Base document styles (CLAUDE.md §4, §5, §8).
+--------------------------------------------------------------------------- */
+
+html {
+  color-scheme: dark; /* the site is a fixed dark theme by design, not a toggle */
+}
+
+/* Smooth scrolling only for users who haven't asked to reduce motion
+   (CLAUDE.md §5: "Smooth scrolling is enabled only inside
+   @media (prefers-reduced-motion: no-preference)"). */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+/* Never fully remove focus outlines; .focus-ring (depth.css) refines the default
+   for interactive primitives, this is the safety-net default for everything else. */
+:focus-visible {
+  outline: 2px solid var(--palette-offwhite);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Progressive-enhancement hook for the Reveal primitive (src/components/ui/Reveal.tsx).
+   A tiny blocking inline script in the document head (src/app/layout.tsx) adds "js" to
+   <html> before first paint. Reveal's pre-animation (hidden) state only exists under
+   this class, and only when the user has not asked to reduce motion — so content is
+   always visible without JavaScript, and always visible for reduced-motion users
+   (CLAUDE.md §5 "Progressive enhancement": never hide meaningful content behind an
+   animation start state that requires JS to reveal).
+--------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal="pending"] {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+[data-reveal="visible"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--motion-duration-entrance) var(--motion-ease),
+    transform var(--motion-duration-entrance) var(--motion-ease);
+}

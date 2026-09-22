@@ -2,7 +2,7 @@
 
 Living plan for the project. Permanent rules are in [CLAUDE.md](CLAUDE.md). This document changes as phases complete and decisions are made.
 
-**Status:** Phase 0 (planning) approved with amendments; decisions locked in §0 (plan v2). **Phase 1 (foundation) is complete** (see §11): local Git repo, Next.js scaffold, folder structure, content skeleton, and assets. **Phase 1.5** locked the public contact values and corrected the phone policy (§0, decisions 13 to 19) and corrected the Git author identity (D28). **Phase 2 (validated content architecture) is complete** (see §11): Zod schemas as the single source of shape for `/content` (§7.2), `npm run content:check` and `npm run resume:check` (§7.3, §8.2), the centralized resume helper, typed content selectors, and `content.example/`. No design or visual sections exist yet. Nothing has been pushed or deployed. Pushing still requires Bhanu's explicit approval (Phase 11). Phase 3 begins only on Bhanu's explicit go-ahead.
+**Status:** Phase 0 (planning) approved with amendments; decisions locked in §0 (plan v2). **Phase 1 (foundation) is complete** (see §11): local Git repo, Next.js scaffold, folder structure, content skeleton, and assets. **Phase 1.5** locked the public contact values and corrected the phone policy (§0, decisions 13 to 19) and corrected the Git author identity (D28). **Phase 2 (validated content architecture) is complete** (see §11): Zod schemas as the single source of shape for `/content` (§7.2), `npm run content:check` and `npm run resume:check` (§7.3, §8.2), the centralized resume helper, typed content selectors, and `content.example/`. **Phase 3 (visual foundation) is complete** (see §11): design tokens, typography, the surface/depth system, the original web/network geometry generator and its first components, the motion foundation, and foundational UI primitives, demonstrated on a temporary design-system specimen at `src/app/page.tsx`. No final sections exist yet. Nothing has been pushed or deployed. Pushing still requires Bhanu's explicit approval (Phase 11). Phase 4 begins only on Bhanu's explicit go-ahead.
 
 **Contents**
 0. Locked decisions (v2)
@@ -217,9 +217,11 @@ Source: `reference/Bhanu_Resume.pdf` (2 pages, text extracted directly; contents
 
 ## 5. Design system
 
+**IMPLEMENTED in Phase 3.** Two-layer token architecture: primitives (`--palette-*`, plain `:root` custom properties, never exposed as Tailwind utilities) and semantic tokens (`--color-*`/`--font-*`/`--text-*`/`--spacing-*`/`--radius-*`, defined via Tailwind v4's `@theme inline` in `src/styles/tokens.css`, which is what both Tailwind utility classes and bespoke CSS in `src/styles/depth.css`/`web.css` consume). Components use only the semantic layer (`bg-surface`, `text-muted`, `font-display`, ...) — this is what the Phase 3 brief's "semantic tokens rather than scattering raw color values everywhere" produced concretely.
+
 ### 5.1 Color tokens
 
-Values proposed for approval. Contrast ratios below were computed (WCAG relative luminance), not estimated.
+Values proposed for approval in Phase 0, unchanged since (contrast ratios below were computed then via WCAG relative luminance, not estimated, and still hold — the hex values in code are copied verbatim from this table, not re-derived).
 
 | Token | Hex | Role |
 |---|---|---|
@@ -250,7 +252,9 @@ Values proposed for approval. Contrast ratios below were computed (WCAG relative
 | crimson-400 on void / graphite | 4.9:1 / 4.3:1 | possible large-text accent on void only |
 | steel-500 on void / graphite | 3.36:1 / 2.96:1 | **decorative only, never text** |
 
-**Crimson budget (~8%):** primary CTA, the one live node/strand, active nav marker, focus-ring accent, selected-state indicators, the "in progress" badge, and the **restrained portrait edge/glow** (decision 6). At most **three** distinct crimson elements in one viewport and none a large fill; in the hero that is typically the primary CTA, the portrait edge, and the single live node. Glows are static; only the live node may pulse.
+**Crimson budget (~8%):** primary CTA, the one live node/strand, active nav marker, focus-ring accent, selected-state indicators, the "in progress" badge, and the **restrained portrait edge/glow** (decision 6). At most **three** distinct crimson elements in one viewport and none a large fill; in the hero that is typically the primary CTA, the portrait edge, and the single live node. Glows are static; only the live node may pulse. Verified in the Phase 3 specimen: the busiest single viewport (Surfaces & controls) shows exactly three — the live-surface edge, its live node, and the primary button.
+
+**Semantic token names in code** (`src/styles/tokens.css`): `--color-background` (void), `--color-surface` (graphite), `--color-surface-elevated` (graphite-hi, `#191C21`), `--color-foreground` (off-white), `--color-muted` (silver), `--color-muted-foreground` (mist), `--color-border` (steel-700), `--color-border-subtle` (steel-900), `--color-accent`/`--color-accent-hover`/`--color-accent-pressed` (crimson-600/500/700), `--color-accent-foreground` (off-white), `--color-glow` (crimson-500), `--color-grid` (steel-500, decorative web strands). One deliberate small consolidation from the Phase 0 sketch: `TechTag`'s hover fill uses `--color-surface-elevated` rather than a separate steel-900-only token — the two are tonally close and a second near-duplicate semantic token wasn't worth adding for one component.
 
 **Surfaces, metals, lighting**
 - Metallic type gradient: off-white → mist → silver → steel-500 (top to bottom), with a narrow off-white specular band.
@@ -258,39 +262,45 @@ Values proposed for approval. Contrast ratios below were computed (WCAG relative
 - Shadows: layered, long, low-alpha black; light direction fixed top-left everywhere for consistency.
 - Grain: one static noise texture (tiny, cached) at ≤ 5% for cinematic depth.
 
-### 5.2 Typography (families confirmed in Phase 1 with a specimen page)
+### 5.2 Typography — IMPLEMENTED in Phase 3 (confirmed via the specimen page)
 
-| Role | Proposal | Notes |
+The Phase 3 brief capped the system at "at most two primary font families." Reading:
+mono for technical metadata/tags is a narrowly-scoped utility family, not a third
+*primary* (prose/display) family, so it doesn't count against the cap — without it,
+Step 2's own requirement to visually distinguish "technical metadata, code/technology
+tags" from prose has no way to be met. Final choice, one swap from the Phase 0 sketch:
+
+| Role | Family | Notes |
 |---|---|---|
-| Display (hero name, section titles) | Bricolage Grotesque (variable, width/optical-size axes) | Heavy, slightly condensed weights extrude well; alternatives to test: Sora, Unbounded, Big Shoulders Display |
-| Body/UI | Inter | Neutral, excellent legibility |
-| Mono (labels, tech tags, metrics captions) | JetBrains Mono | Technical voice |
+| Display (hero name, section titles) | **Space Grotesk** (swapped from the Phase 0 sketch's Bricolage Grotesque) | Geometric grotesque with real character at large sizes; reads as technical/premium without being a "sci-fi" display face; weights 500/600/700 loaded |
+| Body/UI | Inter | Neutral, excellent legibility; weights 400/500/600/700 loaded |
+| Mono (technical metadata, tech tags only) | JetBrains Mono | Technical voice; weights 400/500 loaded |
 
-Fluid type with `clamp()`. Hero name ≈ `clamp(3rem, 11vw, 9rem)` stacked on two lines. Body 16–18 px, line-height 1.6–1.7. 12 px minimum for any meaningful text. Numerals in metrics are tabular.
+Self-hosted via `next/font/google` (`src/app/fonts.ts`), no runtime request to Google Fonts, no external `<link>`. Fluid type via `clamp()`, as tokens in `src/styles/tokens.css` rather than per-component values: `--text-hero: clamp(2.75rem, 6vw + 1rem, 6.5rem)`, `--text-display`, `--text-heading`, `--text-lede`, `--text-label` (the 12px floor). Numerals-are-tabular was not set explicitly in Phase 3 (no metric/number-heavy component exists yet to need it) — revisit when the Proof Strip (Phase 4) is built.
 
-### 5.3 Layout and spacing
+### 5.3 Layout and spacing — IMPLEMENTED in Phase 3
 
-- 12-column grid, max content width 1200 px, 16/24/32 px gutters by breakpoint. Section vertical rhythm 96–160 px desktop, 64–96 px mobile.
-- Breakpoints: 360 (min), 640, 768, 1024, 1280, 1536+.
-- Angular language: 45° and 60° chamfers via `clip-path` on frames and buttons (a nod to mask geometry). Radii otherwise small (2–6 px). No pills.
-- Section headers: mono index label, display title, one-sentence lede, a thin strand drawn from the label into the section.
+- Max content width 1200 px (`--container-content`), narrow reading width 42rem/~672px (`--container-narrow`), responsive gutter 16/24/32px by breakpoint (`--spacing-gutter`) — all tokens in `src/styles/tokens.css`, consumed by `Container`/`SectionShell` (`src/components/ui/`) so no section hand-picks its own width. Section vertical rhythm is a single fluid token, `--spacing-section: clamp(4rem, 3vw + 3rem, 10rem)` (64px-160px), applied by `SectionShell`. The 12-column grid itself is not yet needed (no component has required an explicit column grid) — deferred until a section actually needs one.
+- Breakpoints: Tailwind v4's defaults (640/768/1024/1280/1536) already match the Phase 0 sketch's 640/768/1024/1280/1536 exactly, so none were redefined. 360px (the CLAUDE.md §10 minimum) and 1920px were verified as real viewport sizes in Playwright QA, not as breakpoint tokens.
+- Angular language: `.surface--chamfered` (`src/styles/depth.css`) via `clip-path`, chamfer size `--layout-chamfer: 16px`. Radii otherwise small (`--radius-sm: 4px`, `--radius-md: 8px`). No pills.
+- Section headers: `SectionHeading` (`src/components/ui/`) — mono eyebrow label, display title, optional lede, a thin `aria-hidden` strand line, exactly as specified.
 
-### 5.4 The web geometry system
+### 5.4 The web geometry system — IMPLEMENTED in Phase 3 (foundation only)
 
-A pure, seeded generator `generateWeb({ radials, rings, sag, jitter, seed, size })` returns SVG path data and node coordinates.
-- Radial spokes from a hub; concentric rings drawn as slightly sagging arcs (catenary-style curvature toward the hub) rather than perfect polygons, which is what makes it read as a web, not a target.
-- Deterministic so SSR and client match; snapshot-tested.
-- Variants: **hero web** (large, cropped, three parallax layers), **corner wedge** (card and section ornaments), **thread** (a single vertical strand for the timeline and section rail), **architecture graph** (nodes/edges from project data laid out on a web-like radial or layered arrangement).
-- Every strand can carry a data label; nodes come from real content (technology names, pipeline stages), never invented labels.
-- **Originality (decision 12):** the geometry is generated by our own code. No imported spider/web vector art, no traced character silhouettes, no film or comic artwork, no logos or emblems. Mask-eye angular shapes, when used, are abstract chamfered polygons, not a recognizable emblem.
+`generateWeb({ seed, radials, rings, size, sag, jitter })` (`src/components/web/generate-web.ts`) returns node coordinates and SVG path strings, matching the sketch:
+- Radial spokes from a hub; concentric rings drawn as slightly sagging arcs (quadratic Bézier segments bowed toward the hub) rather than perfect polygons — reads as a web, not a target.
+- Deterministic: a small hand-written `mulberry32` PRNG (no dependency) seeded per call, so server and client render identically. Not yet snapshot-tested (Vitest isn't installed — PLANNING §10.4 lists it as still-future tooling); worth adding when the test suite exists.
+- **Built this phase:** the generator itself, plus `NetworkMesh` (a decorative full-mesh renderer with a one-time `stroke-dashoffset` unfurl) and `Node` (a single node marker, default/live variants, the live variant's pulsing ring). **Not built this phase (deferred to the section that needs it):** the hero-specific composition with three parallax layers (Phase 4), the corner-wedge card ornament, the timeline/rail "thread" variant, and the architecture-graph variant for project diagrams (Phase 6) — Step 5's brief explicitly scoped Phase 3 to reusable primitives, not full compositions.
+- Every strand can carry a data label; nodes come from real content, never invented labels — not yet exercised (the specimen's `NetworkMesh` instances are unlabeled decoration), applies once a real composition uses it.
+- **Originality (decision 12):** the geometry is generated by our own code. No imported spider/web vector art, no traced character silhouettes, no film or comic artwork, no logos or emblems. Mask-eye angular shapes, when used, are abstract chamfered polygons, not a recognizable emblem. The Phase 3 brand mark (`src/app/icon.svg`) follows the same rule: three lines and four dots, no legs, no body silhouette.
 
-### 5.5 Component styling principles
+### 5.5 Component styling principles — IMPLEMENTED in Phase 3 (`Button`, `Surface`, `TechTag`)
 
-- Buttons: chamfered rectangle; primary = crimson-600 fill with off-white label and a top specular highlight; secondary = steel border, silver label, off-white on hover; tertiary = text with an underline strand.
-- Focus ring: 2 px off-white outer, 2 px void gap, crimson-500 inner accent.
-- Tags: mono, 12 px, steel border, no fill; hover raises to steel-900.
-- Cards: graphite panel, web-corner ornament, depth layers for tilt (§6).
-- Portrait frame: back plate, chamfered graphite frame, grayscale image, tone-down overlay, thin static crimson edge (§4).
+- Buttons (`src/components/ui/Button.tsx`, also doubles as "LinkButton" — renders `<a>` when `href` is given, `<button>` otherwise, instead of two near-identical components): chamfered rectangle; primary = crimson-600 fill, off-white label, a static inset top specular highlight; secondary = steel border, silver label, off-white on hover; tertiary = text with an underline strand.
+- Focus ring (`.focus-ring`, `src/styles/depth.css`): 2px off-white outer, 2px void gap, crimson-500 inner accent — exactly as specified, verified visually and via keyboard tab order in Playwright QA.
+- Tags (`TechTag`): mono, 12px, steel border, no fill; hover raises to `--color-surface-elevated` (see §5.1's note on this small consolidation).
+- Cards (`Surface`): graphite gradient panel, optional `elevated`/`chamfered`/`accentEdge` props, optional bounded pointer-tilt (`useTilt`, CLAUDE.md §5 budget rules 3-4). The web-corner ornament isn't wired into `Surface` yet — no card usage so far has needed it; add it as an optional prop when one does, rather than on every card by default.
+- Portrait frame: **not built in Phase 3.** The portrait's dimensional-frame treatment is specific to the Hero composition (Phase 4), where `Surface`'s `chamfered`/`accentEdge` props and `depth.css`'s layering give it what it needs; building the frame itself before the Hero exists would be building UI ahead of the section that uses it, which Phase 3's brief explicitly scoped out.
 
 ---
 
@@ -300,23 +310,25 @@ A pure, seeded generator `generateWeb({ radials, rings, sag, jitter, seed, size 
 1. **Depth over movement.** Sense of dimension from layering, light, and shadow; motion is short and purposeful.
 2. **Budgeted.** Compositor-only properties; ≤ 1 continuous ambient loop; pause off-screen; no animated blur or backdrop-filter (CLAUDE.md §5).
 3. **Gated.** Pointer effects only for fine pointers; reduced-motion gives a complete static experience.
-4. **Cheap by default.** CSS first; Framer Motion (`LazyMotion`, `domAnimation`) where orchestration or layout transitions are needed.
+4. **Cheap by default.** CSS first; Framer Motion (`LazyMotion`, `domAnimation`) where orchestration or layout transitions are needed — **Phase 3 needed none** (CLAUDE.md §5 rule 7, D36); revisit per effect below.
 
 ### 6.2 Effect catalog
 
-| Effect | Technique | Cost / limits |
-|---|---|---|
-| **Dimensional hero name** | Real `<h1>` text on top of 6–10 stacked decorative duplicates offset along Z (or a layered `text-shadow` extrusion) with a metallic gradient face; specular band follows the pointer via CSS variables | Static extrusion is free; pointer tilt ≤ ±5° via rAF; duplicates are `aria-hidden` |
-| **Hero web layers** | Three SVG layers (far/mid/near) with different parallax factors 0.2 / 0.5 / 0.8, moved by transform on pointer and lightly on scroll | Transform only; disabled for reduced-motion and touch |
-| **Web "unfurl" on load** | One-time stroke-dashoffset draw, ~1.2 s, then static | Runs once |
-| **Live node** | The single crimson node pulses gently (scale/opacity) as the only ambient loop | Pauses off-screen and on hidden tab |
-| **Cursor light** | One radial-gradient element translated to the pointer (transform only) | Fine pointers only; lerped in rAF |
-| **Project cards** | `perspective(1000px)`, rotateX/Y ≤ ±8°, children at `translateZ` (title 30 px, tags 20 px, ornament 10 px), specular highlight follows the pointer, shadow shifts opposite the tilt | rAF plus CSS vars; keyboard `:focus-visible` triggers the same lighting; touch gets static depth |
-| **Modal transitions** | Card-to-modal shared-element (`layoutId`) or a simple scale/opacity rise; backdrop fade | Radix handles focus; transitions omitted in reduced-motion |
-| **Reveal on scroll** | Small translate+fade, once per element, IntersectionObserver | Server-visible defaults; instant under reduced-motion |
-| **Proof-strip count-up** | Number tween once when visible | Static under reduced-motion; final value is in the DOM from the start (screen readers read the real number) |
-| **Section rail** | Vertical thread with a node per section, active node crimson, progress via transform | Passive IntersectionObserver |
-| **Skills constellation** | Hover/focus on a category hub lights its strands and nodes | Highlight via opacity/stroke color; text list is the source of truth |
+Built as reusable foundation in Phase 3: **Reveal** (`Reveal.tsx`, generic — not hero/proof-strip-specific yet), **Web "unfurl" on load** (`NetworkMesh.tsx`), **Live node** (`Node.tsx`), and a generic **tilt** (`useTilt`, wired into `Surface` — not project-card-specific composition yet, that's Phase 6). Everything else in this table stays a Phase 4+ plan, built when the section that needs it is built.
+
+| Effect | Technique | Cost / limits | Status |
+|---|---|---|---|
+| **Dimensional hero name** | Real `<h1>` text on top of 6–10 stacked decorative duplicates offset along Z (or a layered `text-shadow` extrusion) with a metallic gradient face; specular band follows the pointer via CSS variables | Static extrusion is free; pointer tilt ≤ ±5° via rAF; duplicates are `aria-hidden` | Phase 4 |
+| **Hero web layers** | Three SVG layers (far/mid/near) with different parallax factors 0.2 / 0.5 / 0.8, moved by transform on pointer and lightly on scroll | Transform only; disabled for reduced-motion and touch | Phase 4 |
+| **Web "unfurl" on load** | One-time stroke-dashoffset draw, ~1.2 s, then static | Runs once | **Built** (generic `NetworkMesh`) |
+| **Live node** | The single crimson node pulses gently (scale/opacity) as the only ambient loop | Pauses off-screen and on hidden tab | **Built** (`Node` variant="live"; pauses off-screen via its own `useInView` — no composing section has to wire this up itself) |
+| **Cursor light** | One radial-gradient element translated to the pointer (transform only) | Fine pointers only; lerped in rAF | Phase 4 |
+| **Project cards** | `perspective(1000px)`, rotateX/Y ≤ ±8°, children at `translateZ` (title 30 px, tags 20 px, ornament 10 px), specular highlight follows the pointer, shadow shifts opposite the tilt | rAF plus CSS vars; keyboard `:focus-visible` triggers the same lighting; touch gets static depth | Generic tilt **built** (`useTilt`, `.tilt`); the per-layer translateZ composition and keyboard-triggered lighting are Phase 6 |
+| **Modal transitions** | Card-to-modal shared-element (`layoutId`) or a simple scale/opacity rise; backdrop fade | Radix handles focus; transitions omitted in reduced-motion | Phase 6 |
+| **Reveal on scroll** | Small translate+fade, once per element, IntersectionObserver | Server-visible defaults; instant under reduced-motion | **Built** (`Reveal.tsx`) |
+| **Proof-strip count-up** | Number tween once when visible | Static under reduced-motion; final value is in the DOM from the start (screen readers read the real number) | Phase 4 |
+| **Section rail** | Vertical thread with a node per section, active node crimson, progress via transform | Passive IntersectionObserver | Phase 3/4 boundary (§10.1) |
+| **Skills constellation** | Hover/focus on a category hub lights its strands and nodes | Highlight via opacity/stroke color; text list is the source of truth | Phase 7 |
 
 ### 6.3 Reduced-motion and low-power behavior
 - `prefers-reduced-motion: reduce`: no parallax, tilt, count-up, unfurl, ambient loop, or smooth scroll; reveals become instant; web renders fully drawn and static.
@@ -515,23 +527,34 @@ bhanu-spider-portfolio/
 ├─ tests/                         # unit + Playwright e2e + a11y — Phase 3+
 └─ src/
    ├─ app/
-   │  ├─ layout.tsx  page.tsx  globals.css  not-found.tsx
-   │  ├─ sitemap.ts  robots.ts  opengraph-image.tsx  icon.svg
-   │  └─ (dev)/design/page.tsx    # design-system specimen; notFound() in production
-   ├─ components/                 # not started — Phase 3+
-   │  ├─ ui/                      # shadcn primitives themed to tokens; content-agnostic
-   │  ├─ layout/                  # Header, MobileMenu, SectionRail, Footer, SectionShell, SkipLink
-   │  ├─ sections/                # Hero, ProofStrip, About, Experience, Projects, Skills, ...
-   │  ├─ web/                     # SpiderWeb, WebLayer, ArchitectureGraph, Thread, SkillConstellation
-   │  ├─ motion/                  # MotionProvider, Reveal, TiltSurface, ParallaxLayer, CursorLight, CountUp
-   │  ├─ project/                 # ProjectCard, ProjectModal
-   │  └─ resume/                  # ResumeActions, ResumeViewer
-   ├─ hooks/                      # usePointerFine, useReducedMotion, useActiveSection, useHashState, useInView — Phase 3+
-   ├─ lib/                        # content.ts (gateway), content-selectors.ts, resume.ts, needs-input.ts, ui-strings.ts — BUILT (Phase 1/2); web-geometry.ts, cn.ts, seo.ts — later
+   │  ├─ layout.tsx  page.tsx  globals.css  fonts.ts  icon.svg   — BUILT (Phase 3)
+   │  │    (page.tsx is a temporary design-system specimen, not the final homepage —
+   │  │    see the Phase 3 folder-placement note below)
+   │  ├─ not-found.tsx  sitemap.ts  robots.ts  opengraph-image.tsx — later phases
+   ├─ components/
+   │  ├─ ui/                      # Container, SectionShell, SectionHeading, Button, Surface,
+   │  │                             TechTag, Reveal, SkipLink, VisuallyHidden — BUILT (Phase 3)
+   │  ├─ layout/                  # Header, MobileMenu, SectionRail, Footer — Phase 4+
+   │  ├─ sections/                # Hero, ProofStrip, About, Experience, Projects, Skills, ... — Phase 4+
+   │  ├─ web/                     # generate-web.ts, NetworkMesh, Node — BUILT (Phase 3);
+   │  │                             ArchitectureGraph, SkillConstellation, a hero-specific
+   │  │                             composition, the card-corner and rail/thread variants — Phase 4+
+   │  ├─ project/                 # ProjectCard, ProjectModal — Phase 6
+   │  └─ resume/                  # ResumeActions, ResumeViewer — Phase 8
+   ├─ hooks/                      # use-media-query, use-reduced-motion, use-pointer-fine,
+   │                                 use-in-view, use-tilt — BUILT (Phase 3); use-active-section,
+   │                                 use-hash-state — Phase 4+/6 (need a nav/modal to serve)
+   ├─ lib/                        # content.ts (gateway), content-selectors.ts, resume.ts,
+   │                                 needs-input.ts, ui-strings.ts — BUILT (Phase 1/2); cn.ts, seo.ts — later
    ├─ schemas/content.ts          # Zod schemas — the single source of shape — BUILT (Phase 2)
-   ├─ styles/                     # tokens.css, depth.css (extrusion, specular), web.css — Phase 3
+   ├─ styles/                     # tokens.css, depth.css, web.css — BUILT (Phase 3)
    └─ types/content.ts            # types inferred from src/schemas/content.ts — BUILT (Phase 1, rebuilt schema-first in Phase 2)
 ```
+
+**Phase 3 folder-placement notes (three deliberate deviations from the sketch above, decided during implementation — §15 D37-D39):**
+- There is no `components/motion/` folder (D37). A `MotionProvider` only earns its place once Framer Motion is actually installed (§6.1 rule 4; CLAUDE.md §5 rule 7); until then, the motion primitives live directly in `hooks/` and `components/ui/Reveal.tsx`.
+- The web geometry generator lives in `components/web/generate-web.ts`, not `lib/web-geometry.ts` (D38) — it's tightly coupled to the components that render it (`NetworkMesh`, `Node`) and §10.3's own component inventory already groups "web geometry" as one unit, so co-locating the pure function with its consumers reads better than splitting them across `lib/` and `components/`.
+- Step 9 of the Phase 3 brief asked to "evolve the current foundation page into a visual-system specimen" (D39) — so `src/app/page.tsx` (the real, single homepage route) is the specimen for now, not a separate `(dev)/design/page.tsx`. The original sketch's permanent, production-hidden design-system page is still a reasonable idea; it just isn't what this phase's explicit instruction asked for. `page.tsx` gets replaced outright when the real Hero is built in Phase 4.
 
 ### 10.2 Boundaries
 `ui/` knows nothing about Bhanu. `sections/` compose `ui/` and read data through `lib/content.ts`. `web/` and `motion/` are content-agnostic and take data via props. `content/` imports only types.
@@ -540,17 +563,17 @@ bhanu-spider-portfolio/
 
 | Group | Components | Notes |
 |---|---|---|
-| Primitives (`ui/`) | Button, Badge/Tag, Card, Dialog, Sheet, Tooltip, Separator, VisuallyHidden | shadcn (Radix), restyled to tokens |
-| Layout | Header, MobileMenu, SectionRail, SectionShell, Footer, SkipLink | `SectionShell` renders `<section aria-labelledby>`, index label, title, lede |
-| Web geometry | `SpiderWeb`, `WebLayer` (parallax wrapper), `Thread`, `ArchitectureGraph`, `SkillConstellation` | all driven by the seeded generator |
-| Motion | `MotionProvider` (LazyMotion), `Reveal`, `TiltSurface`, `ParallaxLayer`, `CursorLight`, `CountUp` | each no-ops under reduced-motion or coarse pointer |
-| Sections (in locked page order) | Hero (with ProofStrip band), About, ExperienceTimeline, ProjectsShowcase, Skills, Certifications, Education, LeadershipAwards, Recommendations, GithubLinks, ResumeSection, Contact | each renders nothing if its data is empty; order comes from `content/navigation.ts` |
-| Project | ProjectCard, ProjectModal | modal code-split via `next/dynamic` |
-| Resume | ResumeActions, ResumeViewer | see §8 |
+| Primitives (`ui/`) | **Built (Phase 3):** `Container`, `SectionShell`, `SectionHeading`, `Button` (doubles as "LinkButton"), `Surface` (doubles as "Card"), `TechTag`, `Reveal`, `SkipLink`, `VisuallyHidden`. **Not built:** Badge (distinct from TechTag — no use case yet), Dialog, Sheet, Tooltip, Separator | Custom-built, not shadcn/ui — Phase 3 evaluated shadcn and declined it (§15 D40): none of these primitives need Radix's focus-trap/portal logic. Revisit for Dialog/Sheet/Tooltip specifically in Phase 6+ |
+| Layout | Header, MobileMenu, SectionRail, Footer — not built (Phase 4+, needs `content/navigation.ts` wired to real sections first) | `SectionShell` (now in `ui/`, not `layout/` — it's a generic wrapper any section uses, not page chrome) renders `<section aria-labelledby>`; `SectionHeading` renders the index label, title, lede |
+| Web geometry | **Built:** `generate-web.ts` (the seeded generator), `NetworkMesh`, `Node`. **Not built:** the hero-specific parallax-layer composition, the card-corner wedge ornament, the timeline/rail "thread" variant, `ArchitectureGraph`, `SkillConstellation` | All driven by the one seeded generator; each remaining variant is built when its section is (Phase 4/6/7) |
+| Motion | **Built:** the hook set (`use-reduced-motion`, `use-pointer-fine`, `use-in-view`, `use-tilt`) plus `Reveal`. **Not built:** `MotionProvider`, `ParallaxLayer`, `CursorLight`, `CountUp` — none needed Framer Motion yet (§6.1 rule 4) | Each no-ops under reduced-motion or a coarse pointer |
+| Sections (in locked page order) | Hero (with ProofStrip band), About, ExperienceTimeline, ProjectsShowcase, Skills, Certifications, Education, LeadershipAwards, Recommendations, GithubLinks, ResumeSection, Contact — none built yet (Phase 4+) | Each renders nothing if its data is empty; order comes from `content/navigation.ts` |
+| Project | ProjectCard, ProjectModal — not built (Phase 6) | Modal code-split via `next/dynamic` |
+| Resume | ResumeActions, ResumeViewer — not built (Phase 8) | `src/lib/resume.ts` (the data helper) is already built — see §8 |
 | Dev-only | Design specimen page | not in production |
 
 ### 10.4 Tooling
-npm; TypeScript strict; ESLint with `jsx-a11y`; Prettier; Zod 4.6.5 (**installed, Phase 2**); tsx 4.23.15 (**installed, Phase 2** — runs `content:check`/`resume:check`, never imported by the app); Vitest for unit tests (web generator determinism, content selectors); Playwright plus axe for e2e/a11y; Lighthouse CI budgets; GitHub Actions. Exact versions pinned at install (including Next.js, Tailwind 4, and the `motion` package that Framer Motion now ships under).
+npm; TypeScript strict; ESLint with `jsx-a11y`; Prettier; Zod 4.6.5 (**installed, Phase 2**); tsx 4.23.15 (**installed, Phase 2** — runs `content:check`/`resume:check`, never imported by the app); Vitest for unit tests (web generator determinism, content selectors — the generator exists now, Phase 3, but Vitest itself is still not installed; still worth adding once a real test suite is warranted); Playwright plus axe for e2e/a11y; Lighthouse CI budgets; GitHub Actions. **Phase 3 added zero new dependencies** — `package.json` is byte-for-byte unchanged from Phase 2 (§15 D36). Exact versions pinned at install (including Next.js, Tailwind 4, and the `motion` package that Framer Motion now ships under, whenever it is installed).
 
 ---
 
@@ -563,7 +586,7 @@ Each phase ends with a summary, a verification list, open questions, and an appr
 | **0** | Study and planning | CLAUDE.md, PLANNING.md (v2, decisions locked in §0) | **Approved with amendments.** Implementation not started; Phase 1 awaits Bhanu's explicit go-ahead (**current gate**) |
 | **1** | Foundation (**complete**) | `.gitignore` first (incl. `reference/`); local `git init` (no remote); Next.js 16.3.5 + TS strict + Tailwind 4 + ESLint via npm; foundation folders; typed content skeleton (`content/*`, `src/types/content.ts`, `needsInput` helper, `@/lib/content` gateway); ESLint import-boundary rules; resume PDF and portrait copied into `public/`; minimal home page; README stub | Lint, typecheck, and build pass; dev server verified with Playwright; `reference/` untracked. **Moved out of Phase 1 by Bhanu's narrower scope:** tokens, `next/font` fonts, shadcn init, Prettier, type-specimen/palette page, base layout and skip link move to Phase 3; Zod moves to Phase 2; MIT license moves to Phase 10 |
 | **2** | Content layer (**complete**) | Zod schemas as the single source of shape (`src/schemas/content.ts`); types inferred from them (`src/types/content.ts`); `npm run content:check` (shape + safety/privacy rules, human-readable, exit-code gated); the resume helper (`src/lib/resume.ts`) and `npm run resume:check`; typed content selectors (`src/lib/content-selectors.ts`); `content.example/` — a complete, structurally valid, entirely fictional mirror of `content/` | Lint, typecheck, `content:check` (both real and `--example`), `resume:check`, and build all pass; the validator was proven to fail on 4 deliberately introduced violations (malformed email, invalid URL, duplicate phone literal, a `reference/` path), each reverted afterward; dev server verified with Playwright — no leaked content, no new console errors. **Not built this phase (moved later, none required by Phase 2's own brief):** `<ResumeActions>` and any other UI (Phase 8); a `content:check` CI workflow (Phase 10); `npm run template:init` (Phase 10); a resume max-size check (no locked decision requires one) |
-| **3** | Design system and primitives | UI primitives, Header/MobileMenu/SectionRail/Footer/SectionShell, motion providers and hooks, `generateWeb` plus tests, depth CSS | Keyboard-complete shell; reduced-motion verified; specimen page |
+| **3** | Design system and primitives (**complete**) | Design tokens (`src/styles/tokens.css`, Tailwind v4 `@theme`); typography (`src/app/fonts.ts`); surface/depth system (`depth.css`); `generateWeb` plus `NetworkMesh`/`Node` (`web.css`); the motion foundation (hooks + `Reveal`, no Framer Motion); UI primitives (`Container`, `SectionShell`, `SectionHeading`, `Button`, `Surface`, `TechTag`, `SkipLink`, `VisuallyHidden`); the brand mark (`icon.svg`); `src/app/page.tsx` evolved into a design-system specimen | Lint, typecheck, `content:check` (both), `resume:check`, and build all pass with zero new dependencies; specimen verified with Playwright at 360/375/768/1280/1440/1920px (no horizontal overflow at any); keyboard tab order and focus rings verified; contrast re-verified (mist-on-void 14.1:1, button labels ≥5.2:1); heading order (one `<h1>`, sequential `<h2>`s), landmark, and `aria-hidden` decorative-element checks passed; zero console errors on both dev and production servers (one real hydration-mismatch bug was found and fixed — `suppressHydrationWarning` on `<html>` for the deliberate pre-hydration `.js` class script); ~134 KB gzipped JS transferred (budget: ~170 KB). **Not built this phase (deferred to the section that needs it, per the brief's explicit scope):** Header/MobileMenu/SectionRail/Footer, `generateWeb`'s unit tests (Vitest isn't installed yet), the hero/card/rail-specific web-geometry compositions, shadcn/ui (evaluated, declined — D40) |
 | **4** | Hero and proof strip | Dimensional name, approved positioning statement (verbatim), hero web layers, framed grayscale portrait root node with crimson edge (CSS only, source untouched), CTAs, email/LinkedIn quick links, proof strip band | Visual review with Bhanu (including portrait treatment and composition); LCP/CLS targets on hero |
 | **5** | About and Experience | About (uses "Bhanu" naturally, full name stays prominent), Experience thread with native disclosure | Content matches resume exactly; no seniority inflation |
 | **6** | Projects | Cards (tilt), modal, **custom sanitized architecture diagrams**, hash routing | Modal a11y test (focus, Esc, return, Back) passes; only resume-based content; a review confirms no CSU/vendor/bill/account/meter/operational data anywhere |
@@ -683,3 +706,10 @@ Real content (certification details, approved project links, featured repositori
 | D33 | `resume:check` does not enforce a maximum PDF size | Decided in Phase 2 | No locked decision specifies a limit; inventing an arbitrary threshold seemed worse than adding one later if a real oversized file becomes a problem |
 | D34 | `content.example/`'s one recommendation record is `approved: true` (unlike the real, empty `content/recommendations.ts`) | Decided in Phase 2 | The template's job is to show the shape of every mechanism, including an approved recommendation; it is clearly fictional (a made-up author at a fictional company) so it cannot be mistaken for a real endorsement |
 | D35 | `content.example/`'s phone number is filled in (206-555-0142, NANPA's reserved 555-01XX fictional range), rather than left out | Decided in Phase 2 | Shows a fork exactly how to set one up safely, including the reserved-range convention, instead of leaving the pattern to guesswork |
+| D36 | Framer Motion is not installed in Phase 3. Every Phase 3 motion need (reveal, stagger, hover tilt, node pulse, one-time path draw-in) is CSS transitions/`@keyframes` plus four small hooks | Decided in Phase 3 | Matches the brief's own "use Framer Motion only if needed" test — nothing in Phase 3's scope needed it. Zero new dependencies added this phase; revisit when a later phase needs orchestration CSS can't do cleanly (candidate: the project modal's shared-element transition, Phase 6) |
+| D37 | No `components/motion/` folder yet; motion primitives live in `hooks/` and `components/ui/Reveal.tsx` | Decided in Phase 3 | A `MotionProvider` (LazyMotion wrapper) has nothing to wrap until Framer Motion is installed (D36) |
+| D38 | The web-geometry generator lives at `components/web/generate-web.ts`, not `lib/web-geometry.ts` as first sketched | Decided in Phase 3 | Tightly coupled to its consumers (`NetworkMesh`, `Node`); §10.3 already treats "web geometry" as one inventory group |
+| D39 | `src/app/page.tsx` (the real homepage route) was evolved directly into the Phase 3 specimen, not a separate `(dev)/design/page.tsx` | Decided in Phase 3, per the phase's explicit instruction ("evolve the current foundation page") | Will be replaced outright by the real Hero in Phase 4; the earlier sketch's permanent hidden specimen page is still a reasonable idea for later if Bhanu wants one |
+| D40 | shadcn/ui evaluated and declined for Phase 3 | Decided in Phase 3 | None of Button/Surface/TechTag need Radix's focus-trap/portal logic; revisit specifically for Dialog/Sheet/Tooltip in Phase 6+, per CLAUDE.md §7's "explain why before adding it" |
+| D41 | Two primary type families (Space Grotesk, Inter) plus one narrowly-scoped mono utility (JetBrains Mono) for technical labels/tags only — read as satisfying the brief's "at most two primary families," with mono not counted as a third *primary* (prose/display) family | Decided in Phase 3 | Step 2 of the brief separately requires distinguishing "technical metadata, code/technology tags" from prose, which is unreachable without some monospace role; flagged for Bhanu to correct if this reading is wrong |
+| D42 | Display face swapped from the Phase 0 sketch's Bricolage Grotesque to Space Grotesk | Decided in Phase 3 | Both are geometric grotesques; Space Grotesk is a more conservative, widely-proven choice for "premium tech," and reads clearly as "not sci-fi" per the brief's explicit warning |

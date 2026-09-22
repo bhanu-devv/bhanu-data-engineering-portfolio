@@ -1,0 +1,131 @@
+/**
+ * Design tokens — the single place color, type, spacing, radius, shadow, and motion
+ * values are defined (CLAUDE.md §4, §7: "Tailwind reads design tokens... No raw
+ * hex/rgb values in components."). Two layers:
+ *
+ *  1. Primitives (plain `:root` custom properties, `--palette-*`/`--motion-*`/etc.):
+ *     the literal values, kept in one place so they can be referenced or audited.
+ *     `--palette-*` is deliberately NOT a Tailwind-recognized `@theme` namespace, so
+ *     these never become their own utility classes — components reach color only
+ *     through the semantic layer below (the instruction: "semantic tokens rather than
+ *     scattering raw color values everywhere").
+ *  2. Semantic tokens (Tailwind v4 `@theme`, recognized namespaces): what components
+ *     actually use, either as Tailwind utilities (`bg-background`, `text-muted`,
+ *     `font-display`) or as `var(--color-*)` in bespoke CSS (src/styles/depth.css,
+ *     src/styles/web.css).
+ *
+ * Palette hex values and contrast ratios are exactly what PLANNING.md §5.1 already
+ * computed and approved — this file does not invent new colors.
+ */
+
+:root {
+  /* ---------------------------------------------------------------------
+     Primitive palette (PLANNING.md §5.1) — ~92% grayscale, ~8% crimson.
+  --------------------------------------------------------------------- */
+  --palette-void: #050506;
+  --palette-carbon: #0c0d10;
+  --palette-graphite: #15171b;
+  --palette-graphite-hi: #191c21; /* panel gradient start, PLANNING §5.1 "Surfaces" */
+  --palette-graphite-lo: #111317; /* panel gradient end */
+  --palette-steel-900: #1f2329;
+  --palette-steel-700: #343a43;
+  --palette-steel-500: #5b636f;
+  --palette-silver: #a9b0ba;
+  --palette-mist: #d3d7dd;
+  --palette-offwhite: #f3f4f6;
+  --palette-crimson-700: #8e1a2e;
+  --palette-crimson-600: #a8203a;
+  --palette-crimson-500: #c42340;
+  --palette-crimson-400: #e0405d;
+
+  /* Motion primitives (CLAUDE.md §5 budget rules: durations/easing, one shared curve) */
+  --motion-duration-fast: 180ms; /* UI feedback: 150-250ms */
+  --motion-duration-entrance: 650ms; /* entrances: 500-800ms */
+  --motion-duration-unfurl: 1200ms; /* one-time web/path draw-in */
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1); /* the one shared easing curve */
+
+  /* Layout primitives (PLANNING.md §5.3) */
+  --layout-container-max: 1200px;
+  --layout-content-narrow: 42rem; /* ~65-75ch reading measure for prose blocks */
+  --layout-gutter: 16px;
+  --layout-radius-sm: 4px;
+  --layout-radius-md: 8px;
+  --layout-chamfer: 16px; /* clip-path chamfer size, PLANNING §5.3 "angular language" */
+}
+
+@media (min-width: 640px) {
+  :root {
+    --layout-gutter: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --layout-gutter: 32px;
+  }
+}
+
+@theme inline {
+  /* -----------------------------------------------------------------
+     Semantic color tokens -> Tailwind utilities (bg-background, text-
+     foreground, border-border, text-accent, etc.). Names match CLAUDE.md
+     §4's shadcn-style vocabulary and the Phase 3 brief's example list.
+  ----------------------------------------------------------------- */
+  --color-background: var(--palette-void);
+  --color-surface: var(--palette-graphite);
+  --color-surface-elevated: var(--palette-graphite-hi);
+  --color-foreground: var(--palette-offwhite);
+  --color-muted: var(--palette-silver);
+  --color-muted-foreground: var(--palette-mist);
+  --color-border: var(--palette-steel-700);
+  --color-border-subtle: var(--palette-steel-900);
+
+  /* Crimson: active/interactive states only (CLAUDE.md §4 "Crimson rules") */
+  --color-accent: var(--palette-crimson-600);
+  --color-accent-hover: var(--palette-crimson-500);
+  --color-accent-pressed: var(--palette-crimson-700);
+  --color-accent-foreground: var(--palette-offwhite);
+  --color-glow: var(--palette-crimson-500);
+
+  /* Decorative-only, never text (PLANNING §5.1 contrast table) */
+  --color-grid: var(--palette-steel-500);
+
+  /* Shadow color primitive (full shadow recipes live in depth.css) */
+  --color-shadow: #000000;
+
+  /* -----------------------------------------------------------------
+     Fonts -> Tailwind utilities (font-display, font-body, font-mono).
+     Variables injected by next/font in src/app/fonts.ts.
+  ----------------------------------------------------------------- */
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* -----------------------------------------------------------------
+     Fluid type scale -> Tailwind utilities (text-hero, text-display, ...).
+     12px floor everywhere (CLAUDE.md §8 "Minimum text size 12px").
+  ----------------------------------------------------------------- */
+  --text-hero: clamp(2.75rem, 6vw + 1rem, 6.5rem);
+  --text-display: clamp(2rem, 3.2vw + 1rem, 3.5rem);
+  --text-heading: clamp(1.375rem, 1.4vw + 1rem, 1.875rem);
+  --text-lede: clamp(1.0625rem, 0.4vw + 0.9rem, 1.25rem);
+  --text-label: 0.75rem; /* 12px floor */
+
+  /* -----------------------------------------------------------------
+     Layout tokens -> Tailwind utilities (max-w-container, gap-gutter, ...).
+  ----------------------------------------------------------------- */
+  --spacing-gutter: var(--layout-gutter);
+  /* Vertical section rhythm (PLANNING §5.3: "96-160px desktop, 64-96px mobile") */
+  --spacing-section: clamp(4rem, 3vw + 3rem, 10rem);
+  --container-content: var(--layout-container-max);
+  --container-narrow: var(--layout-content-narrow);
+  --radius-sm: var(--layout-radius-sm);
+  --radius-md: var(--layout-radius-md);
+
+  /* -----------------------------------------------------------------
+     Motion tokens -> Tailwind utilities (duration-fast, ease-brand, ...).
+  ----------------------------------------------------------------- */
+  --ease-brand: var(--motion-ease);
+  --default-transition-duration: var(--motion-duration-fast);
+  --default-transition-timing-function: var(--motion-ease);
+}

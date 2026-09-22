@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!--
+    Original site mark (CLAUDE.md §4 "Web Is the Pipeline"; Phase 3 Step 11): a hub
+    node with three short strands to outer nodes, one of them "live" (crimson) — the
+    same node/strand vocabulary as the rest of the site, at icon scale. Not a spider:
+    no legs, no body silhouette, nothing traced from any existing character mark.
+  -->
+  <rect width="32" height="32" rx="7" fill="#050506" />
+  <g stroke="#A9B0BA" stroke-width="1.4" stroke-linecap="round">
+    <line x1="16" y1="16" x2="16" y2="7" />
+    <line x1="16" y1="16" x2="8.6" y2="20.5" />
+    <line x1="16" y1="16" x2="23.4" y2="20.5" />
+  </g>
+  <circle cx="16" cy="16" r="2.4" fill="#F3F4F6" />
+  <circle cx="16" cy="7" r="1.6" fill="#A9B0BA" />
+  <circle cx="8.6" cy="20.5" r="1.6" fill="#A9B0BA" />
+  <circle cx="23.4" cy="20.5" r="2" fill="#C42340" />
+</svg>
