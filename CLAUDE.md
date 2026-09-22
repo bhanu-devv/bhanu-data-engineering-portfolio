@@ -9,7 +9,7 @@ This file is loaded every session. It holds the rules that do not change. The ev
 
 ## 1. Status and working agreements
 
-- **Current status:** planning approved with amendments (decisions locked in the table below and in PLANNING.md §0). **Phase 1 (foundation) is complete:** local Git repo, Next.js scaffold, folder structure, content skeleton, and assets. No design or visual sections are built yet, nothing is pushed or deployed, and Phase 2 begins only on Bhanu's explicit go-ahead. **Phase 1.5** locked the public contact values and corrected the Git author identity (the repo-local identity is Bhanu's GitHub noreply address; PLANNING.md D28). Nothing is pushed, and pushing still requires Bhanu's explicit approval. The active phase is tracked in PLANNING.md §11.
+- **Current status:** planning approved with amendments (decisions locked in the table below and in PLANNING.md §0). **Phase 1 (foundation) and Phase 1.5 (contact values, Git identity) are complete.** **Phase 2 (validated content architecture) is complete:** Zod schemas as the single source of shape for `/content`, `npm run content:check` and `npm run resume:check`, the centralized resume helper (`src/lib/resume.ts`), typed content selectors (`src/lib/content-selectors.ts`), and `content.example/` (a fictional, structurally complete template). No design or visual sections are built yet, and nothing is pushed or deployed; pushing still requires Bhanu's explicit approval. The active phase is tracked in PLANNING.md §11.
 - **Work in phases, stop at each gate.** Finish the phase, summarize what changed, list what is still needed from Bhanu, then wait for approval before starting the next phase.
 - **Never do these without explicit approval in chat for that specific action:** `git init` on a remote, pushing anywhere, creating a GitHub repo, connecting GitHub or fetching from the GitHub API, deploying, publishing an artifact, buying/pointing a domain, adding analytics, installing a dependency not already listed in §7.
 - **Locked decisions may be changed only with Bhanu's explicit approval.** If a task seems to require breaking one, stop and ask.
@@ -32,7 +32,7 @@ This file is loaded every session. It holds the rules that do not change. The ev
 | 12 | **Visual concept:** "The Web Is the Pipeline" (spider web → network graph → pipeline → connected data systems), sophisticated, abstract, professional, cinematic. No Marvel/Spider-Man logos, film artwork, copyrighted character illustrations, or fan-site aesthetics. | §4 |
 | 13 | **Public contact values (Phase 1.5):** the public professional email and the approved public phone number are set once in `content/site.ts` (`contact.email`, `contact.phone`); the LinkedIn and GitHub profile URLs are set in `content/socials.ts`. The phone appears only in the Contact section. The public resume PDF may contain the phone number. | §2 rule 8; PLANNING §0 |
 - **Ask before deciding when a choice belongs to Bhanu** (what to publish about their employer, contact details, wording of claims about themself). Decide alone on purely technical choices and note the decision.
-- **Commits:** small, one concern each, Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `style:`, `test:`). Commit only when asked. Never commit `reference/`, `.env*` (except `.env.example`), `.DS_Store`, or anything containing secrets or another person's data. **Commit author and committer must be Bhanu's GitHub noreply address, never a personal email.** This repo's local `user.name` and `user.email` are set to that address, and the initial commit was amended to use it (PLANNING.md D28); do not change them to a personal address. Before any push, verify with `git log --format='%an <%ae> | %cn <%ce>'`, and advise enabling GitHub's "Block command line pushes that expose my email" setting. No reflog purge is required (local reflog data is never pushed).
+- **Commits:** small, one concern each, Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `style:`, `test:`). Commit only when asked. Never commit `reference/`, `.env*` (except `.env.example`), `.DS_Store`, or anything containing secrets or another person's data. **Commit author and committer must be Bhanu's GitHub noreply address, never a personal email.** This repo's local `user.name` and `user.email` are set to that address, and the initial commit was amended to use it (PLANNING.md D28); do not change them to a personal address. Before any push, verify with `git log --format='%an <%ae> | %cn <%ce>'`, and advise enabling GitHub's "Block command line pushes that expose my email" setting. No reflog purge is required (local reflog data is never pushed). **Commit messages in this repository carry no `Co-Authored-By` trailer** — Bhanu asked for sole authorship of this repo's history; this overrides the harness's default attribution guidance for every commit here, not just the one it was first raised about.
 - **Do not modify files in `reference/`.** They are read-only development material.
 
 ## 2. Content accuracy (highest-priority rule)
@@ -125,7 +125,8 @@ Moderate and elegant. Motion clarifies structure; it is never decoration for its
 
 **Separate content from presentation.** No personal or professional text, numbers, links, or dates inside React components.
 
-- All content lives in `/content` as typed TypeScript modules: `site` (profile, SEO, contact), `navigation`, `resume`, `experience`, `projects`, `skills`, `education`, `certifications`, `awards`, `leadership`, `recommendations`, `socials`, `metrics`. Types live in `src/types/content.ts` and are validated at build time by a script (Zod).
+- All content lives in `/content` as typed TypeScript modules: `site` (profile, SEO, contact), `navigation`, `resume`, `experience`, `projects`, `skills`, `education`, `certifications`, `awards`, `leadership`, `recommendations`, `socials`, `metrics`. The shape of every module is defined exactly once, as a Zod schema in `src/schemas/content.ts`; `src/types/content.ts` infers its TypeScript types from those schemas (never hand-duplicate a shape in both places). Run `npm run content:check` to validate content against the schemas plus the cross-content safety rules in §2 (a manual/CI step today, not yet wired into `npm run build`).
+- Presentation code that needs more than the raw collections (only approved recommendations, only public social links, whether a section currently has content to render) uses the selectors in `src/lib/content-selectors.ts`, which itself goes through `@/lib/content` — never re-filter `@/lib/content`'s arrays inline in a component.
 - All media lives in `/public`. A future user should mostly change only `/content` and `/public`.
 - UI strings that are chrome (e.g., "Skip to content", "Close") are the only text allowed in components, and they live in one `src/lib/ui-strings.ts` so they can be localized or reworded in one place.
 - **Section order is locked** and defined once in `content/navigation.ts`:
@@ -141,9 +142,9 @@ Moderate and elegant. Motion clarifies structure; it is never decoration for its
 
 ## 7. Tech stack and conventions
 
-**Installed (Phase 1, exact versions pinned, npm):** Next.js 16.3.5 (App Router, Turbopack), React 19.2.8, TypeScript 5.9.3 (strict), Tailwind CSS 4.3.3, ESLint 9.39.5 with `eslint-config-next`.
+**Installed (exact versions pinned, npm):** Next.js 16.3.5 (App Router, Turbopack), React 19.2.8, TypeScript 5.9.3 (strict), Tailwind CSS 4.3.3, ESLint 9.39.5 with `eslint-config-next` (Phase 1); Zod 4.6.5 for content schemas/validation (dependency — `src/schemas/content.ts` is genuinely part of the shipped source tree) and tsx 4.23.15 to run the path-alias-aware `content:check`/`resume:check` scripts (devDependency — never imported by the app) (Phase 2).
 
-**Still planned (each installed only in the phase that needs it, after approval):** Framer Motion (`motion`), shadcn/ui (Radix-based) where useful, Zod for content validation, Prettier, custom CSS for bespoke depth effects. Later, in the quality phase: Playwright + axe, Lighthouse CI. Pin exact versions at install time (`.npmrc` sets `save-exact=true`).
+**Still planned (each installed only in the phase that needs it, after approval):** Framer Motion (`motion`), shadcn/ui (Radix-based) where useful, Prettier, custom CSS for bespoke depth effects. Later, in the quality phase: Playwright + axe, Lighthouse CI. Pin exact versions at install time (`.npmrc` sets `save-exact=true`).
 
 **Conventions**
 - TypeScript `strict`; no `any` without a comment justifying it.
@@ -216,7 +217,7 @@ Package manager: **npm** (Bhanu's Phase 1 instruction; supersedes the earlier pn
 | `npm run build` | Production build |
 | `npm run lint` | ESLint, including the import-boundary rules |
 | `npm run typecheck` | `next typegen` then `tsc --noEmit` (route types must be generated first) |
-
-Planned, not yet implemented (Phase 2): `npm run content:check`, `npm run resume:check`.
+| `npm run content:check` | Validates `/content` against the Zod schemas plus safety/privacy rules (CLAUDE.md §2). Add `-- --example` to validate `content.example/` instead. |
+| `npm run resume:check` | Verifies the resume PDF exists, is a real PDF, matches the locked public path, and that no file hardcodes a competing resume path or a `reference/` path. Read-only — never modifies the PDF. |
 
 **Framework note:** `next.config.ts` sets `agentRules: false`. Without it, `next dev` appends an agent-instructions block to this file on every run. Do not remove that setting, and if this file ever shows a `nextjs-agent-rules` block, delete it.

@@ -2,7 +2,7 @@
 
 Living plan for the project. Permanent rules are in [CLAUDE.md](CLAUDE.md). This document changes as phases complete and decisions are made.
 
-**Status:** Phase 0 (planning) approved with amendments; decisions locked in §0 (plan v2). **Phase 1 (foundation) is complete** (see §11): local Git repo, Next.js scaffold, folder structure, content skeleton, and assets. **Phase 1.5** locked the public contact values and corrected the phone policy (§0, decisions 13 to 19) and corrected the Git author identity (D28). No design or visual sections exist yet. Nothing has been pushed or deployed. Pushing still requires Bhanu's explicit approval (Phase 11). Phase 2 begins only on Bhanu's explicit go-ahead.
+**Status:** Phase 0 (planning) approved with amendments; decisions locked in §0 (plan v2). **Phase 1 (foundation) is complete** (see §11): local Git repo, Next.js scaffold, folder structure, content skeleton, and assets. **Phase 1.5** locked the public contact values and corrected the phone policy (§0, decisions 13 to 19) and corrected the Git author identity (D28). **Phase 2 (validated content architecture) is complete** (see §11): Zod schemas as the single source of shape for `/content` (§7.2), `npm run content:check` and `npm run resume:check` (§7.3, §8.2), the centralized resume helper, typed content selectors, and `content.example/`. No design or visual sections exist yet. Nothing has been pushed or deployed. Pushing still requires Bhanu's explicit approval (Phase 11). Phase 3 begins only on Bhanu's explicit go-ahead.
 
 **Contents**
 0. Locked decisions (v2)
@@ -350,69 +350,31 @@ content/
   recommendations.ts  empty until real text arrives
   socials.ts          GitHub, LinkedIn, others; each with visibility flag
   index.ts            re-exports typed collections
-content.example/      neutral placeholder identity, same schema (§12)
+content.example/      built in Phase 2: fictional "Jordan A. Rivera" identity, same schema, same barrel shape (§12)
 ```
 
-### 7.2 Core types (conceptual; final versions live in `src/types/content.ts`)
+### 7.2 Core types — IMPLEMENTED in Phase 2, schema-first
 
-```ts
-type NeedsInput = { readonly __needsInput: true; reason: string };
-type Maybe<T> = T | NeedsInput;                 // set via needsInput("why")
+The types below were originally sketched as hand-written TypeScript interfaces (Phase 0). In Phase 2 that plan changed: **`src/schemas/content.ts` defines every shape once, as a Zod schema, and `src/types/content.ts` infers its TypeScript types from those schemas** (`export type Site = z.infer<typeof siteSchema>`, etc.) — see that file's own header comment for why. This was the direct answer to "avoid unnecessary duplication between TypeScript types and Zod schemas": there is exactly one definition of each shape, not two that could drift apart. `NeedsInput`/`Maybe<T>` and `YearMonth` (the "YYYY-MM" template literal) are also derived from the schema file, via `z.infer` and a typed `.transform()` respectively, so even those keep a single source of truth instead of a hand-copied regex-shaped string type.
 
-interface Site {
-  name: { full: string;       // "Bhanudeepak Nagumothu"  (prominent: hero, title, footer, JSON-LD)
-          short: string;      // "Bhanu"                  (conversational/supporting copy)
-          monogram: string }; // e.g. "BN" (proposed)
-  positioning: string;        // approved, verbatim: "Data Engineer building reliable cloud data platforms,
-                              //   pipelines, and automation that turn operational data into trusted systems."
-  location: string;
-  contact: { email: Maybe<string>;
-              phone?: { display: string; tel: string } };  // approved for the Contact section ONLY (decision 19)
-  // `contact.phone` is the only phone field in the schema; it appears in no other module.
-  seo: { title: string; description: string; url: Maybe<string>; ogImage?: string };
-  portrait: { src: string; alt: string; width: number; height: number };  // 400 x 400, source untouched
-}
+Implementation differs from the original conceptual sketch above in a few small, deliberate ways:
+- `Metric` has no separate `qualifier` field — the qualifier is written directly into `value` (e.g. `"~3 days → 5 min"`), which is what the actual metrics needed.
+- `Experience.end` is `YearMonth | "present"`, not `Date` (dates are never day-precise here). `Experience` has no `metrics`/`skills` fields — unused by any real content, dropped rather than shipped speculatively.
+- `Project` has no `period` field (redundant with its bullets/dates) and uses `metricIds?: string[]` (references into `content/metrics.ts`) instead of embedding full `Metric` objects, so a number is still defined in exactly one place even when a project cites it.
+- `Education` has no separate `field` — the field of study is already part of `degree` (e.g. "Master of Science in Information Systems").
 
-interface ResumeConfig {
-  file: string;              // "/resume/bhanu-resume.pdf"  <- only place this string exists
-  title: string;             // "Bhanu Nagumothu Resume"
-  downloadName: string;      // filename the browser saves as
-  label?: string;            // optional human version label; not required for cache-busting
-  inlineViewer: boolean;
-}
+Full types: `src/types/content.ts`. Full validation rules: `src/schemas/content.ts`.
 
-interface Metric      { id; value; qualifier?; label; context; source: string }
-interface Experience  { id; title; org; location; start; end: Date|"present"; employmentType?;
-                        bullets: string[]; metrics?: string[]; skills?: string[] }
-interface Project     { slug; title; summary; status: "in-progress"|"complete"; period?;
-                        tech: string[]; bullets: string[]; metrics?: Metric[];
-                        architecture?: { nodes: Node[]; edges: [string,string][] };
-                        links?: { github?: string; demo?: string };   // only Bhanu-approved, real URLs
-                        images?: ProjectImage[];                      // each requires sanitizedApproved: true;
-                                                                      // no internal/operational screenshots (decision 5)
-                        featured: boolean }
-interface SkillGroup  { id; name; skills: string[] }             // names verbatim from resume
-interface Education   { id; school; degree; field; location; start?; end; expected?: boolean; gpa?: string }
-interface Certification { id; name; issuer; kind?: "certification"|"applied-skill"|"training";
-                        issued?; expires?; credentialId?; verifyUrl?; badge?: string }
-                        // every field after `kind` is optional and omitted from the UI when absent (decision 8)
-interface Award       { id; name; org?; amount?: string; date? }
-interface Leadership  { id; role; org; start; end; bullets: string[] }
-interface Recommendation { id; quote; author; role; org; relationship; url?;
-                           approved: boolean }   // true only when Bhanu approved publishing AND the author
-                                                 // gave permission; unapproved records never render (decision 7)
-interface Social      { id; label; url; public: boolean }
-```
+### 7.3 "Needs input" mechanism — IMPLEMENTED in Phase 2 (`npm run content:check`)
 
-### 7.3 "Needs input" mechanism
 - `needsInput("credential IDs and issue dates")` marks unknown values without inventing anything.
-- **Omit cleanly (decisions 7, 8, 9).** Selectors drop unresolved or absent fields. The live site never renders placeholders such as "TBD", "N/A", dummy links, or fake IDs. A certification with no ID, date, or verify URL shows only its name and issuer. A section with no renderable items is omitted (and removed from nav, rail, and JSON-LD).
-- **Two classes of gap:**
-  - *Required* (the site should not ship without them): the canonical site URL and the resume file when resume actions are enabled (the public email is now set). `content:check --strict` fails on these.
-  - *Optional-omitted* (site ships fine without them): certification IDs/dates/verify URLs/badges, project links, GitHub repository entries, recommendations, extra About details. `content:check` lists these as informational items only.
-- `npm run content:check` (Zod plus custom rules) also reports: recommendations lacking `approved: true` (they are excluded and flagged); metrics lacking a `source`; a project image lacking `sanitizedApproved: true`; an expected-graduation date already in the past; and **any phone-number-like pattern found anywhere except `content/site.ts` `contact.phone`** (decision 19), including other content modules, `content.example/`, docs, metadata, and structured-data builders. It also verifies the phone is rendered only from the Contact section. It also warns if `site.positioning` differs from the approved statement recorded in §0 (the check's expected value is updated only when Bhanu approves new wording).
-- `npm run resume:check` additionally reports, for information only, whether the PDF has a text layer (ATS readability). The phone number inside the PDF is approved (decision 19), so it is not flagged.
-- CI runs `content:check --strict` for the production branch so a required gap cannot ship silently.
+- **Omit cleanly (decisions 7, 8, 9).** Selectors drop unresolved or absent fields. The live site never renders placeholders such as "TBD", "N/A", dummy links, or fake IDs. A certification with no ID, date, or verify URL shows only its name and issuer. A section with no renderable items is omitted (`src/lib/content-selectors.ts`'s `isSectionRenderable`/`getRenderableNavigation`).
+- **Two classes of gap**, both enforced by the same run of `npm run content:check` (there is no separate `--strict` flag — every `content:check` run is the strict one; the distinction is severity, not a mode):
+  - *Required* (an ERROR, exit code 1): the public email must be resolved (it is). The resume file's existence is `resume:check`'s job, not `content:check`'s.
+  - *Optional-omitted* (an INFO note, exit code 0): the canonical site URL staying `needsInput()` until a domain exists; certification IDs/dates/verify URLs/badges; project links; GitHub repository entries; recommendations; extra About details. These print but never fail the check.
+- `npm run content:check` (Zod `safeParse` over every collection, plus custom rules) also reports as ERRORs: an unapproved recommendation (`approved !== true`); a locked-section-order mismatch (real content only — `content.example/` gets an INFO note instead, since forks may reorder); accidental placeholder content ("lorem ipsum", "TODO", "TBD", ...; a WARN instead of an ERROR when validating `content.example/`); a `reference/` path or the reference-only resume filename; a private local filesystem path; an obvious secret (API key/token/private-key pattern); a keyword associated with internal operational records (account/meter/invoice, best-effort); and **any phone-number-like literal found anywhere except `content/site.ts`'s `site.contact.phone`** (decision 19) — both an exact duplicate of the approved number and any other phone-shaped value are flagged, each with its own message. An unexplained long digit run (8+ digits, not the approved phone) is a WARN. Run `npm run content:check -- --example` to validate `content.example/` with the identical rules.
+- `npm run resume:check` (§8.2) covers the resume PDF and path specifically: existence, real `%PDF-` header, the locked public path, no competing hardcoded resume path, and no `reference/` path in `src/`, `content/`, or `content.example/`. It never modifies the PDF. For information only, it also reports whether the PDF appears to carry a text layer and whether that text layer contains the approved phone number (decision 19 — never flagged as an issue).
+- CI wiring (running these in GitHub Actions on every push) is Phase 10, not yet built.
 
 ### 7.4 Assets
 `public/images/{profile,projects/<slug>,certifications,og}`, `public/resume/bhanu-resume.pdf`. Every asset is documented in `docs/ASSETS.md` (source, permission, whether it may be reused by forks).
@@ -423,23 +385,21 @@ interface Social      { id; label; url; public: boolean }
 
 **Goal:** Bhanu replaces one PDF file and everything (view, download, metadata, cache) keeps working without editing components.
 
-### 8.1 Single source of truth
-`content/resume.ts` is the only file that mentions the resume path. The stable public path is `/resume/bhanu-resume.pdf`, so the PDF in `public/resume/` is always named `bhanu-resume.pdf` and versions are not encoded in filenames.
+### 8.1 Single source of truth — IMPLEMENTED
+`content/resume.ts` is the only file that mentions the resume path (`resume:check` enforces this — §7.3). The stable public path is `/resume/bhanu-resume.pdf`, so the PDF in `public/resume/` is always named `bhanu-resume.pdf` and versions are not encoded in filenames.
 
 ```ts
 export const resume: ResumeConfig = {
   file: "/resume/bhanu-resume.pdf",
-  title: "Bhanu Nagumothu Resume",
-  downloadName: "Bhanu-Nagumothu-Resume.pdf",
-  label: undefined,            // optional, e.g. "September 2026"
+  title: "Bhanudeepak Nagumothu Resume",
+  downloadName: "Bhanudeepak-Nagumothu-Resume.pdf",
   inlineViewer: true,
 };
 ```
 
 ### 8.2 One helper, one component
-- `src/lib/resume.ts` (server-side, build-time) reads the file's stats and a short content hash and returns `{ viewHref, downloadHref, downloadName, title, updatedAt, sizeLabel, available }`. The hash is appended as `?v=<hash>` so browsers and CDNs never serve a stale copy after a replacement, with no manual version bump.
-- `<ResumeActions>` is the only component that renders View/Download. The nav, hero, resume section, contact section, and footer all use it.
-- If the file is missing, `available: false` and the buttons are not rendered (no dead links); `content:check` fails in strict mode.
+- **`src/lib/resume.ts` (IMPLEMENTED, Phase 2):** server-side, reads the file's stats and a short SHA-256 content hash and returns `{ viewHref, downloadHref, downloadName, title, label, inlineViewer, updatedAt, sizeLabel, available }`. The hash is appended as `?v=<hash>` so browsers and CDNs never serve a stale copy after a replacement, with no manual version bump. If the file is missing, `available: false` (no dead links) — callers must check this before rendering View/Download controls.
+- **`<ResumeActions>` (not built — Phase 8):** the only component that will render View/Download, used by the nav, hero, resume section, contact section, and footer. Phase 2 deliberately stops at the data helper; no UI yet.
 
 ### 8.3 Viewing and downloading
 - **View (desktop):** dialog with the PDF in an `<object>`; the viewer mounts only when opened (lazy). A visible "Open in new tab" fallback link is always present.
@@ -447,11 +407,13 @@ export const resume: ResumeConfig = {
 - **Download:** same-origin `<a href download="Bhanu-Nagumothu-Resume.pdf">`, so the saved filename is friendly and stable regardless of the source filename.
 - **Headers:** `next.config` sets `Cache-Control: public, max-age=0, must-revalidate` for `/resume/*` on hosts that honor it; the hash query covers hosts that don't.
 
-### 8.4 Update workflow (documented in README and `docs/CUSTOMIZING.md`)
+### 8.4 Update workflow (documented in README)
 1. Export the new PDF.
 2. Overwrite `public/resume/bhanu-resume.pdf` (same name).
-3. Run `npm run resume:check` (file exists, starts with `%PDF`, size under a limit, has a text layer for ATS, prints hash and date).
+3. Run `npm run resume:check` — IMPLEMENTED (Phase 2): confirms the file exists, starts with `%PDF-`, matches the locked public path, and that nothing hardcodes a second resume path; reports (informationally) whether it has a text layer and whether that text layer contains the approved phone number. **Not implemented: a maximum-size check.** Not required by any locked decision; add one later if a real oversized PDF becomes a problem.
 4. Commit as `chore(resume): update resume` and deploy.
+
+`docs/CUSTOMIZING.md` (Phase 10) will repeat this workflow for template users.
 
 No component edits. No config edits, unless Bhanu wants a human-readable `label` (or, in the unlikely event the path itself must change, the single `file` field in `content/resume.ts`). Older versions stay in git history; nothing versioned sits in `public/`.
 
@@ -543,20 +505,20 @@ bhanu-spider-portfolio/
 ├─ .gitignore  .npmrc  .nvmrc  package.json  package-lock.json  next.config.ts  tsconfig.json
 ├─ reference/                     # local only, gitignored, never deployed
 ├─ content/                       # ALL personal content (typed TS modules)
-├─ content.example/               # neutral placeholder identity, same schema
+├─ content.example/               # fictional "Jordan A. Rivera" identity, same schema — BUILT (Phase 2)
 ├─ public/
-│  ├─ resume/bhanu-resume.pdf
+│  ├─ resume/bhanu-resume.pdf     # gitignored for now — D24
 │  └─ images/{profile,projects,certifications,og}/
-├─ docs/                          # ARCHITECTURE, CUSTOMIZING, DEPLOYING, ASSETS
-├─ scripts/                       # content-check, resume-check (Node/TS)
-├─ .github/workflows/ci.yml
-├─ tests/                         # unit + Playwright e2e + a11y
+├─ docs/                          # ARCHITECTURE, CUSTOMIZING, DEPLOYING, ASSETS — Phase 10
+├─ scripts/                       # content-check.ts, resume-check.ts — BUILT (Phase 2), run via tsx
+├─ .github/workflows/ci.yml       # Phase 10
+├─ tests/                         # unit + Playwright e2e + a11y — Phase 3+
 └─ src/
    ├─ app/
    │  ├─ layout.tsx  page.tsx  globals.css  not-found.tsx
    │  ├─ sitemap.ts  robots.ts  opengraph-image.tsx  icon.svg
    │  └─ (dev)/design/page.tsx    # design-system specimen; notFound() in production
-   ├─ components/
+   ├─ components/                 # not started — Phase 3+
    │  ├─ ui/                      # shadcn primitives themed to tokens; content-agnostic
    │  ├─ layout/                  # Header, MobileMenu, SectionRail, Footer, SectionShell, SkipLink
    │  ├─ sections/                # Hero, ProofStrip, About, Experience, Projects, Skills, ...
@@ -564,10 +526,11 @@ bhanu-spider-portfolio/
    │  ├─ motion/                  # MotionProvider, Reveal, TiltSurface, ParallaxLayer, CursorLight, CountUp
    │  ├─ project/                 # ProjectCard, ProjectModal
    │  └─ resume/                  # ResumeActions, ResumeViewer
-   ├─ hooks/                      # usePointerFine, useReducedMotion, useActiveSection, useHashState, useInView
-   ├─ lib/                        # content.ts (selectors), resume.ts, web-geometry.ts, ui-strings.ts, cn.ts, seo.ts
-   ├─ styles/                     # tokens.css, depth.css (extrusion, specular), web.css
-   └─ types/content.ts
+   ├─ hooks/                      # usePointerFine, useReducedMotion, useActiveSection, useHashState, useInView — Phase 3+
+   ├─ lib/                        # content.ts (gateway), content-selectors.ts, resume.ts, needs-input.ts, ui-strings.ts — BUILT (Phase 1/2); web-geometry.ts, cn.ts, seo.ts — later
+   ├─ schemas/content.ts          # Zod schemas — the single source of shape — BUILT (Phase 2)
+   ├─ styles/                     # tokens.css, depth.css (extrusion, specular), web.css — Phase 3
+   └─ types/content.ts            # types inferred from src/schemas/content.ts — BUILT (Phase 1, rebuilt schema-first in Phase 2)
 ```
 
 ### 10.2 Boundaries
@@ -587,7 +550,7 @@ bhanu-spider-portfolio/
 | Dev-only | Design specimen page | not in production |
 
 ### 10.4 Tooling
-npm; TypeScript strict; ESLint with `jsx-a11y`; Prettier; Zod; Vitest for unit tests (web generator determinism, content selectors); Playwright plus axe for e2e/a11y; Lighthouse CI budgets; GitHub Actions. Exact versions pinned at install (including Next.js, Tailwind 4, and the `motion` package that Framer Motion now ships under).
+npm; TypeScript strict; ESLint with `jsx-a11y`; Prettier; Zod 4.6.5 (**installed, Phase 2**); tsx 4.23.15 (**installed, Phase 2** — runs `content:check`/`resume:check`, never imported by the app); Vitest for unit tests (web generator determinism, content selectors); Playwright plus axe for e2e/a11y; Lighthouse CI budgets; GitHub Actions. Exact versions pinned at install (including Next.js, Tailwind 4, and the `motion` package that Framer Motion now ships under).
 
 ---
 
@@ -599,7 +562,7 @@ Each phase ends with a summary, a verification list, open questions, and an appr
 |---|---|---|---|
 | **0** | Study and planning | CLAUDE.md, PLANNING.md (v2, decisions locked in §0) | **Approved with amendments.** Implementation not started; Phase 1 awaits Bhanu's explicit go-ahead (**current gate**) |
 | **1** | Foundation (**complete**) | `.gitignore` first (incl. `reference/`); local `git init` (no remote); Next.js 16.3.5 + TS strict + Tailwind 4 + ESLint via npm; foundation folders; typed content skeleton (`content/*`, `src/types/content.ts`, `needsInput` helper, `@/lib/content` gateway); ESLint import-boundary rules; resume PDF and portrait copied into `public/`; minimal home page; README stub | Lint, typecheck, and build pass; dev server verified with Playwright; `reference/` untracked. **Moved out of Phase 1 by Bhanu's narrower scope:** tokens, `next/font` fonts, shadcn init, Prettier, type-specimen/palette page, base layout and skip link move to Phase 3; Zod moves to Phase 2; MIT license moves to Phase 10 |
-| **2** | Content layer | Types, `content/*` populated **only** from the resume, `needsInput` helper, selectors, `content:check`, resume config/helper/`resume:check`, `content.example/` skeleton | `content:check` lists exactly the open items in §14; resume swap test passes (replace PDF, no code edits) |
+| **2** | Content layer (**complete**) | Zod schemas as the single source of shape (`src/schemas/content.ts`); types inferred from them (`src/types/content.ts`); `npm run content:check` (shape + safety/privacy rules, human-readable, exit-code gated); the resume helper (`src/lib/resume.ts`) and `npm run resume:check`; typed content selectors (`src/lib/content-selectors.ts`); `content.example/` — a complete, structurally valid, entirely fictional mirror of `content/` | Lint, typecheck, `content:check` (both real and `--example`), `resume:check`, and build all pass; the validator was proven to fail on 4 deliberately introduced violations (malformed email, invalid URL, duplicate phone literal, a `reference/` path), each reverted afterward; dev server verified with Playwright — no leaked content, no new console errors. **Not built this phase (moved later, none required by Phase 2's own brief):** `<ResumeActions>` and any other UI (Phase 8); a `content:check` CI workflow (Phase 10); `npm run template:init` (Phase 10); a resume max-size check (no locked decision requires one) |
 | **3** | Design system and primitives | UI primitives, Header/MobileMenu/SectionRail/Footer/SectionShell, motion providers and hooks, `generateWeb` plus tests, depth CSS | Keyboard-complete shell; reduced-motion verified; specimen page |
 | **4** | Hero and proof strip | Dimensional name, approved positioning statement (verbatim), hero web layers, framed grayscale portrait root node with crimson edge (CSS only, source untouched), CTAs, email/LinkedIn quick links, proof strip band | Visual review with Bhanu (including portrait treatment and composition); LCP/CLS targets on hero |
 | **5** | About and Experience | About (uses "Bhanu" naturally, full name stays prominent), Experience thread with native disclosure | Content matches resume exactly; no seniority inflation |
@@ -618,8 +581,8 @@ Real content (certification details, approved project links, featured repositori
 ## 12. Making the repository reusable
 
 1. **Content/presentation split** (§7) is the main reuse mechanism. A user edits `/content` and `/public`.
-2. **`content.example/`** ships a neutral, fictional identity in the same schema (clearly labeled as sample data) so a fork can run immediately.
-3. **`npm run template:init`** (Phase 10): copies `content.example/` over `content/`, replaces personal assets with neutral placeholders, and prompts before overwriting anything. Also documented as manual steps.
+2. **`content.example/` (built, Phase 2)** ships a neutral, fictional identity ("Jordan A. Rivera," a data engineer at fictional companies) in the exact same schema and barrel shape as `content/`, so a fork can see the pattern immediately. It deliberately demonstrates every mechanism the real site uses: a `needsInput()` field left open (`seo.url`), a certification with every optional field filled in next to one with none, a project in each status, and an *approved* recommendation (the real `content/recommendations.ts` stays empty until real text exists — content.example's one entry exists purely to show the shape). It validates cleanly under the same `npm run content:check -- --example`.
+3. **`npm run template:init`** (Phase 10, not yet built): copies `content.example/` over `content/`, replaces personal assets with neutral placeholders, and prompts before overwriting anything. Until then, the manual step is: copy each `content.example/*.ts` file's shape into the matching `content/*.ts` file.
 4. **Theming in three places:** color tokens (`tokens.css`), font choices (`layout.tsx` via `next/font`), and the web generator parameters in `content/site.ts`. Re-skinning the accent is a few variables.
 5. **Sections toggle by data.** Delete the contents of an array and the section (and its nav entry) disappears.
 6. **Licensing clarity:** MIT for code; `CONTENT-NOTICE` states that Bhanu's text, photo, resume, and project write-ups are not licensed for reuse. Forks must replace them.
@@ -627,8 +590,8 @@ Real content (certification details, approved project links, featured repositori
 8. **Zero-config build:** `.env.example` lists optional variables (`NEXT_PUBLIC_SITE_URL`, optional contact form endpoint, optional analytics ID); the site builds with none set. No secrets anywhere.
 9. **Alternative considered:** two repositories (personal site and clean template). Simpler for strict separation but doubles maintenance. Recommended: one repo with `content/` and `content.example/` plus the notice.
 10. **Github template flag** enabled once public, so "Use this template" creates a clean history for forks.
-11. **Strict content/presentation boundary (decision 11).** Components, hooks, `lib/`, styles, and tests contain no Bhanu-specific strings, links, numbers, or assets; tests and the design specimen use `content.example/` fixtures. A CI check greps `src/` and `tests/` for Bhanu-specific identifiers (name, profile URLs) and fails if any appear, so the boundary cannot erode silently.
-12. **Privacy-safe by default for forks.** The only phone field is optional and omitted in `content.example/`, unapproved recommendations never render, optional fields omit cleanly, and image records require a `sanitizedApproved` flag. A fork inherits those guardrails.
+11. **Strict content/presentation boundary (decision 11).** Components, hooks, `lib/`, styles, and tests contain no Bhanu-specific strings, links, numbers, or assets; tests and the design specimen use `content.example/` fixtures. ESLint already enforces the shape of this boundary for every `content/**/*.ts` and `content.example/**/*.ts` file (Phase 1/2); a CI check that greps `src/` and `tests/` for Bhanu-specific identifiers is still Phase 10.
+12. **Privacy-safe by default for forks.** The phone field is optional (a fork can omit it entirely, or fill it in with a NANPA-reserved 555-01XX number as `content.example/site.ts` does), the schema has exactly one phone field so `content:check` can confirm nothing duplicates it, unapproved recommendations never render, optional fields omit cleanly, and image records require a `sanitizedApproved` flag. A fork inherits those guardrails, and `npm run content:check` re-verifies them for whatever content the fork writes.
 13. **GitHub integration is optional data, not baked-in behavior.** Featured repositories are plain entries in `content/`; any build-time metadata fetch (Phase 12) is behind a flag that is off by default, so forks make no network calls unless they opt in.
 14. **Neutral visual identity is not required for forks.** The web/pipeline concept and tokens are reusable as-is; the licensing notice (item 6) covers Bhanu's personal content, not the design system code.
 
@@ -714,3 +677,9 @@ Real content (certification details, approved project links, featured repositori
 | D27 | Public contact values locked: email and phone in `content/site.ts` (phone shown in Contact only); LinkedIn and GitHub profile URLs in `content/socials.ts` | Locked (Phase 1.5, decisions 13 to 15 and 19) | Replaces the earlier "to confirm" state; the resume-PDF phone question is resolved (decision 19) |
 | D28 | Git author identity correction: the initial commit was authored and committed with a personal address. Repo-local `user.name` is "Bhanudeepak Nagumothu" and `user.email` is the GitHub noreply address `269264082+bhanu-devv@users.noreply.github.com`; the unpushed commit was amended (`--reset-author`) so author and committer both use it. No reflog purge is needed for GitHub privacy (local reflog data and unreachable objects are not pushed). **Still to do by Bhanu:** enable GitHub's "Block command line pushes that expose my email" | **Resolved** (identity); GitHub setting pending Bhanu | Author and committer emails become public in pushed history and cannot be reliably retracted |
 | D29 | The phone number is approved for public display in the Contact section (as a `tel:` link) and for the downloadable resume. Placement is limited to Contact: not hero, nav, footer, metadata, Open Graph, or JSON-LD; extending it needs Bhanu's approval. No obfuscation is applied, so some spam-scraping risk is accepted | Locked (decision 19) | Bhanu's explicit approval; the Contact-only limit is my reading of "in the Contact section" and keeps exposure minimal |
+| D30 | Zod schemas (`src/schemas/content.ts`) are the single source of shape for `/content`; TypeScript types (`src/types/content.ts`) are inferred via `z.infer`, not hand-duplicated. `YearMonth` uses a typed `.transform()` so the inferred type stays the precise template literal, not plain `string` | Decided in Phase 2 | Directly answers the brief's "avoid unnecessary duplication between TypeScript types and Zod schemas"; a second, hand-maintained interface set would drift from the schema over time |
+| D31 | `tsx` runs `content:check`/`resume:check` (a new devDependency, never imported by the app); Node's own native TypeScript stripping was tried first and rejected because it does not resolve the `@/*`/`@content/*` tsconfig path aliases the scripts need | Decided in Phase 2 | The alternative (hand-rolling a path-alias resolver, or rewriting every content module to use relative imports) was more code and more fragile than one well-known, single-purpose dependency |
+| D32 | `content:check` has no separate `--strict` CLI flag. Every run applies the same rules; the required/optional distinction is expressed as ERROR vs. INFO severity, not a mode | Decided in Phase 2 | Simpler mental model — "does it pass" is always the same question — and the original plan's `--strict` was really describing severity, not two different rule sets |
+| D33 | `resume:check` does not enforce a maximum PDF size | Decided in Phase 2 | No locked decision specifies a limit; inventing an arbitrary threshold seemed worse than adding one later if a real oversized file becomes a problem |
+| D34 | `content.example/`'s one recommendation record is `approved: true` (unlike the real, empty `content/recommendations.ts`) | Decided in Phase 2 | The template's job is to show the shape of every mechanism, including an approved recommendation; it is clearly fictional (a made-up author at a fictional company) so it cannot be mistaken for a real endorsement |
+| D35 | `content.example/`'s phone number is filled in (206-555-0142, NANPA's reserved 555-01XX fictional range), rather than left out | Decided in Phase 2 | Shows a fork exactly how to set one up safely, including the reserved-range convention, instead of leaving the pattern to guesswork |

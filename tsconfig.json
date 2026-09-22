@@ -11,6 +11,9 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // scripts/*.ts run via `tsx` (Node ESM), which needs explicit ".ts" extensions on
+    // relative imports; safe alongside noEmit: true (already set above).
+    "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [

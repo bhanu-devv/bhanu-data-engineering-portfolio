@@ -24,9 +24,11 @@ const eslintConfig = defineConfig([
       ],
     },
   },
-  // /content holds data only: it must not depend on UI code or the content gateway.
+  // /content and /content.example hold data only: neither may depend on UI code or the
+  // content gateway (content.example mirrors the same boundary so it teaches the
+  // correct pattern to anyone using it as a starting point — CLAUDE.md §6, §9).
   {
-    files: ["content/**/*.ts"],
+    files: ["content/**/*.ts", "content.example/**/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
