@@ -6,6 +6,7 @@ export { site } from "./site";
 export { navigation } from "./navigation";
 export { resume } from "./resume";
 export { metrics } from "./metrics";
+export { heroNetwork } from "./hero-network";
 export { experience } from "./experience";
 export { projects } from "./projects";
 export { skills } from "./skills";

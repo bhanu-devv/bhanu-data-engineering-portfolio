@@ -33,6 +33,7 @@ import type {
   leadershipSchema,
   recommendationSchema,
   socialSchema,
+  heroNetworkNodeSchema,
 } from "@/schemas/content";
 export type { YearMonth } from "@/schemas/content";
 
@@ -58,3 +59,4 @@ export type Award = z.infer<typeof awardSchema>;
 export type Leadership = z.infer<typeof leadershipSchema>;
 export type Recommendation = z.infer<typeof recommendationSchema>;
 export type Social = z.infer<typeof socialSchema>;
+export type HeroNetworkNode = z.infer<typeof heroNetworkNodeSchema>;

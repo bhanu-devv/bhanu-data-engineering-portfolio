@@ -265,3 +265,16 @@ export const socialSchema = z.object({
   url: z.string().url(),
   public: z.boolean(),
 });
+
+// A small, curated subset of real technologies for the Hero's network visualization
+// (Phase 4 Step 3). `label` must already appear in content/skills.ts or
+// content/projects.ts — content-check.ts cross-checks this at runtime, since a Zod
+// schema alone can't reference other content modules. Never a place to invent a
+// technology the resume doesn't support.
+export const heroNetworkNodeSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  // Marks the single "trusted output" node (CLAUDE.md §4 crimson budget). At most one
+  // true — content-check.ts enforces that too.
+  live: z.boolean().optional(),
+});

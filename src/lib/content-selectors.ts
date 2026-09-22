@@ -72,3 +72,16 @@ export function isSectionRenderable(id: NavSection["id"]): boolean {
 export function getRenderableNavigation(): NavSection[] {
   return navigation.filter((section) => isSectionRenderable(section.id));
 }
+
+/**
+ * The in-page anchor for a locked section id (Phase 4.5). Typed against `NavSection["id"]`
+ * rather than a bare string, so a CTA that links to a section (e.g. Hero's "Explore My
+ * Work" → `getSectionHref("projects")`) breaks at compile time if that section's id is
+ * ever renamed in `content/navigation.ts` — the anchor can never silently go dead. A
+ * section not yet built during phased development is a normal, harmless `#anchor` with
+ * nothing to scroll to; it becomes live the moment that section exists, with no code
+ * change here.
+ */
+export function getSectionHref(id: NavSection["id"]): string {
+  return `#${id}`;
+}

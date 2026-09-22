@@ -9,6 +9,7 @@ export {
   navigation,
   resume,
   metrics,
+  heroNetwork,
   experience,
   projects,
   skills,

@@ -92,6 +92,34 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Dimensional hero name (CLAUDE.md §5; PLANNING.md §6.2 "Dimensional hero name";
+   Phase 4). A metallic top-to-bottom gradient fill plus a stepped text-shadow
+   extrusion — real, selectable text throughout (CLAUDE.md §4: "never text-in-image").
+   Static, not pointer-following: Phase 4 Step 9 ("do not animate everything
+   simultaneously") already spends the hero's motion budget on the reveal sequence and
+   the network's node pulse; the gradient itself reads as a fixed top-left light source
+   without needing JS. `color` is the solid fallback for the rare browser that lacks
+   `background-clip: text` — never invisible.
+--------------------------------------------------------------------------- */
+
+.hero-name {
+  color: var(--palette-offwhite);
+  text-shadow:
+    1px 1px 0 var(--palette-steel-700),
+    2px 2px 0 var(--palette-steel-900),
+    3px 3px 6px rgba(0, 0, 0, 0.45);
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .hero-name {
+    background: linear-gradient(180deg, var(--palette-offwhite) 0%, var(--palette-mist) 55%, var(--palette-silver) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Cinematic grain — one static, cached, low-alpha noise texture (PLANNING
    §5.1: "one static noise texture at ≤5%"). Pure CSS, no image request.
 --------------------------------------------------------------------------- */

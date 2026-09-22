@@ -46,12 +46,14 @@ import {
   leadershipSchema,
   recommendationSchema,
   socialSchema,
+  heroNetworkNodeSchema,
 } from "../src/schemas/content.ts";
 import type {
   Award,
   Certification,
   Education,
   Experience,
+  HeroNetworkNode,
   Leadership,
   Metric,
   NavSection,
@@ -68,6 +70,7 @@ interface ContentSet {
   navigation: NavSection[];
   resume: ResumeConfig;
   metrics: Metric[];
+  heroNetwork: HeroNetworkNode[];
   experience: Experience[];
   projects: Project[];
   skills: SkillGroup[];
@@ -136,6 +139,7 @@ async function main() {
   validateMany("navigation", navSectionSchema, content.navigation);
   validateOne("resume", resumeConfigSchema, content.resume);
   validateMany("metrics", metricSchema, content.metrics);
+  validateMany("hero-network", heroNetworkNodeSchema, content.heroNetwork);
   validateMany("experience", experienceSchema, content.experience);
   validateMany("projects", projectSchema, content.projects);
   validateMany("skills", skillGroupSchema, content.skills);
@@ -378,6 +382,30 @@ async function main() {
       );
     }
   });
+
+  // -------------------------------------------------------------------------
+  // 6. Hero network: every label must be a real, already-listed technology
+  //    (Phase 4 Step 3 / Step 1: never hard-code — or invent — content the content
+  //    layer doesn't already have), and at most one node may be "live".
+  // -------------------------------------------------------------------------
+
+  const knownTech = new Set<string>();
+  for (const group of content.skills) for (const skill of group.skills) knownTech.add(skill);
+  for (const project of content.projects) for (const tech of project.tech) knownTech.add(tech);
+
+  content.heroNetwork.forEach((node, i) => {
+    if (!knownTech.has(node.label)) {
+      err(
+        `${fileFor("hero-network")} → heroNetwork[${i}].label`,
+        `"${node.label}" does not appear verbatim in any skills or projects tech list — the Hero network may only show technologies the content layer already states.`,
+      );
+    }
+  });
+
+  const liveCount = content.heroNetwork.filter((node) => node.live === true).length;
+  if (liveCount > 1) {
+    err(fileFor("hero-network"), `${liveCount} nodes are marked "live" — at most one is allowed (CLAUDE.md §4 crimson budget).`);
+  }
 
   // -------------------------------------------------------------------------
   // Report
