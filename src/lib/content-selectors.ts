@@ -112,3 +112,17 @@ export function getProjectMetrics(project: Project): Metric[] {
   const bySlug = new Map(metrics.map((metric) => [metric.id, metric]));
   return project.metricIds.map((id) => bySlug.get(id)).filter((metric): metric is Metric => metric !== undefined);
 }
+
+/**
+ * Skill labels that also appear verbatim in `experience[].tech` or `projects[].tech`
+ * (Phase 7 Step 6: "distinguish technologies demonstrated in current work/projects...
+ * do not invent a proficiency ranking"). A factual, data-driven relationship — not a
+ * self-scored rating — so it doubles as Step 4's "create hierarchy" without a second,
+ * separately-curated "anchor technologies" list to keep in sync by hand.
+ */
+export function getEvidencedSkills(): Set<string> {
+  const evidenced = new Set<string>();
+  for (const role of experience) for (const tech of role.tech ?? []) evidenced.add(tech);
+  for (const project of projects) for (const tech of project.tech) evidenced.add(tech);
+  return evidenced;
+}

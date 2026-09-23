@@ -17,4 +17,6 @@ export const uiStrings = {
   caseStudyValidationHeading: "Validation & reliability",
   caseStudyMilestonesHeading: "Build status",
   caseStudyImpactHeading: "Impact",
+  // Certifications (Phase 7).
+  verifyCredential: "Verify credential",
 } as const;
