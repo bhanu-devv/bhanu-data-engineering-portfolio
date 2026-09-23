@@ -37,6 +37,7 @@ import {
   navSectionSchema,
   resumeConfigSchema,
   metricSchema,
+  aboutSchema,
   experienceSchema,
   projectSchema,
   skillGroupSchema,
@@ -49,6 +50,7 @@ import {
   heroNetworkNodeSchema,
 } from "../src/schemas/content.ts";
 import type {
+  About,
   Award,
   Certification,
   Education,
@@ -71,6 +73,7 @@ interface ContentSet {
   resume: ResumeConfig;
   metrics: Metric[];
   heroNetwork: HeroNetworkNode[];
+  about: About;
   experience: Experience[];
   projects: Project[];
   skills: SkillGroup[];
@@ -140,6 +143,7 @@ async function main() {
   validateOne("resume", resumeConfigSchema, content.resume);
   validateMany("metrics", metricSchema, content.metrics);
   validateMany("hero-network", heroNetworkNodeSchema, content.heroNetwork);
+  validateOne("about", aboutSchema, content.about);
   validateMany("experience", experienceSchema, content.experience);
   validateMany("projects", projectSchema, content.projects);
   validateMany("skills", skillGroupSchema, content.skills);
@@ -229,6 +233,7 @@ async function main() {
     ["navigation", content.navigation],
     ["resume", content.resume],
     ["metrics", content.metrics],
+    ["about", content.about],
     ["experience", content.experience],
     ["projects", content.projects],
     ["skills", content.skills],
@@ -295,6 +300,27 @@ async function main() {
   ];
   const LONG_DIGIT_RUN = /\b\d{8,}\b/g;
 
+  // --- 4f. Exaggerated seniority / scale claims (CLAUDE.md §2 rule 3; real content only —
+  //     content.example/'s fictional persona is free to use a title like "Senior Data
+  //     Engineer" to demonstrate the schema's shape) ---------------------------------
+
+  const EXAGGERATION_MARKERS: RegExp[] = [
+    /\bsenior\b/i,
+    /\bprincipal\b/i,
+    /\bexpert\b/i,
+    /\barchitect\b/i,
+    /\barchitect-level\b/i,
+    /\blead (engineer|developer|architect)\b/i,
+    /\bindustry leader\b/i,
+    /\bworld[\s-]class\b/i,
+    /\b10x engineer\b/i,
+    /\brevolutionary\b/i,
+    /\bvisionary\b/i,
+    /\benterprise-grade\b/i,
+    /\bpetabyte\b/i,
+    /\b99\.9%\b/i,
+  ];
+
   // --- 4f. Phone confinement ---------------------------------------------------
 
   const phone = content.site.contact.phone;
@@ -338,6 +364,13 @@ async function main() {
 
         if (CSU_KEYWORD_MARKERS.some((marker) => marker.test(text))) {
           err(location, `contains a keyword associated with internal operational records ("${text.slice(0, 80)}") — CLAUDE.md §2 rule 9 prohibits account/meter/invoice-level data`);
+        }
+
+        if (!useExample) {
+          const match = EXAGGERATION_MARKERS.find((marker) => marker.test(text));
+          if (match) {
+            err(location, `reads as an exaggerated seniority or scale claim ("${text.slice(0, 80)}") — CLAUDE.md §2 rule 3 prohibits inflating positioning beyond what the resume states`);
+          }
         }
         for (const digitsMatch of text.matchAll(LONG_DIGIT_RUN)) {
           const digits = digitsMatch[0];
@@ -406,6 +439,22 @@ async function main() {
   if (liveCount > 1) {
     err(fileFor("hero-network"), `${liveCount} nodes are marked "live" — at most one is allowed (CLAUDE.md §4 crimson budget).`);
   }
+
+  // -------------------------------------------------------------------------
+  // 7. Experience tech tags: same rule as the hero network — every label must already
+  //    appear in skills/projects (Phase 5 Step 11: never dump the full skill list).
+  // -------------------------------------------------------------------------
+
+  content.experience.forEach((role, i) => {
+    for (const tech of role.tech ?? []) {
+      if (!knownTech.has(tech)) {
+        err(
+          `${fileFor("experience")} → experience[${i}].tech`,
+          `"${tech}" does not appear verbatim in any skills or projects tech list — experience tech tags may only show technologies the content layer already states.`,
+        );
+      }
+    }
+  });
 
   // -------------------------------------------------------------------------
   // Report

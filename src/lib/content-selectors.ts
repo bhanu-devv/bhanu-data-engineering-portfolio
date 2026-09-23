@@ -37,6 +37,15 @@ export function getFeaturedProjects(): Project[] {
 }
 
 /**
+ * Projects still in progress (Phase 5) — used by About's short "now building" line.
+ * Reads `content/projects.ts` directly rather than duplicating the project's title as
+ * separate About prose, so the two never drift out of sync.
+ */
+export function getInProgressProjects(): Project[] {
+  return projects.filter((entry) => entry.status === "in-progress");
+}
+
+/**
  * Whether a given locked section currently has content to render (CLAUDE.md §6
  * "sections are data-driven and self-hiding"). Hero, About, Resume, and Contact are
  * driven by singleton objects (`site`, `resume`) that always carry at least identity

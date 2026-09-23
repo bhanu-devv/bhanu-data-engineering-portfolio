@@ -22,6 +22,7 @@ import type {
   siteSchema,
   resumeConfigSchema,
   metricSchema,
+  aboutSchema,
   experienceSchema,
   architectureNodeSchema,
   projectImageSchema,
@@ -48,6 +49,7 @@ export type Site = z.infer<typeof siteSchema>;
 export type NavSection = z.infer<typeof navSectionSchema>;
 export type ResumeConfig = z.infer<typeof resumeConfigSchema>;
 export type Metric = z.infer<typeof metricSchema>;
+export type About = z.infer<typeof aboutSchema>;
 export type Experience = z.infer<typeof experienceSchema>;
 export type ArchitectureNode = z.infer<typeof architectureNodeSchema>;
 export type ProjectImage = z.infer<typeof projectImageSchema>;

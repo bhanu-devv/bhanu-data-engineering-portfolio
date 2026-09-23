@@ -10,6 +10,7 @@ export {
   resume,
   metrics,
   heroNetwork,
+  about,
   experience,
   projects,
   skills,

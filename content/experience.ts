@@ -1,6 +1,10 @@
 import type { Experience } from "@/types/content";
 
-/** Verbatim from the resume. Titles are real titles; never relabel them. */
+/**
+ * Verbatim from the resume. Titles are real titles; never relabel them. `bullets` is
+ * the fidelity source; `summary`/`highlights`/`impact` (Phase 5) are portfolio-friendly
+ * synthesis of the same facts, not a second invented set — see CLAUDE.md §2 rule 1.
+ */
 export const experience: Experience[] = [
   {
     id: "csu-utilities-data-analyst",
@@ -16,6 +20,16 @@ export const experience: Experience[] = [
       "Implement data-quality controls to identify duplicate records, missing billing periods, meter-date gaps, usage discrepancies, unit mismatches, and reconciliation exceptions through automated validation and root-cause analysis.",
       "Configure secure Azure SQL connectivity, access controls, firewall rules, and workflow automation while supporting downstream Power BI reporting and operational analytics.",
     ],
+    summary:
+      "Own the data layer behind utility operations across more than 20 campus buildings at Cleveland State University — turning multi-source billing, meter, and usage records into a platform people can trust.",
+    highlights: [
+      "Design and build a centralized Azure SQL / SQL Server data platform for buildings, vendors, meters, bills, usage, and payments, with relational modeling and validation rules built in.",
+      "Build Python and SQL ETL pipelines that ingest, transform, validate, and reconcile vendor bills, spreadsheets, and API data into structured, analysis-ready storage.",
+      "Catch data-quality issues before they spread — duplicate records, missing billing periods, meter-date gaps, unit mismatches — through automated validation and root-cause analysis.",
+      "Secure the platform's Azure SQL connectivity and access controls, and support the Power BI reporting built on top of it.",
+    ],
+    impact: "Covers 170+ recurring monthly bill-related items across the platform.",
+    tech: ["Python", "SQL", "ETL/ELT", "Azure SQL Database", "Microsoft SQL Server", "Power BI"],
   },
   {
     id: "vipany-cyber-data-review-analyst",
@@ -30,6 +44,14 @@ export const experience: Experience[] = [
       "Improved reliability across 80K+ records by identifying data inconsistencies, performing root-cause analysis, standardizing records, and documenting recurring data-quality issues.",
       "Applied structured review and validation procedures to detect missing, inconsistent, and duplicate information while supporting accurate downstream data usage and reporting.",
     ],
+    summary:
+      "Reviewed high-volume operational data under contract, catching the inconsistencies that would otherwise reach downstream reporting.",
+    highlights: [
+      "Reviewed, validated, cleaned, and reconciled 1,000+ records daily against structured quality-control and exception-review processes.",
+      "Investigated inconsistent, missing, and duplicate data down to the root cause rather than just flagging it.",
+      "Documented recurring data-quality issues to standardize how the team caught them going forward.",
+    ],
+    impact: "Improved reliability across 80,000+ reviewed records.",
   },
   {
     id: "laxmi-precast-business-data-analyst",
@@ -42,6 +64,13 @@ export const experience: Experience[] = [
       "Analyzed financial, sales, customer-order, payment, and operational data to support budgeting, cost visibility, business-performance tracking, and management decision-making.",
       "Maintained and reconciled structured datasets for sales, customer orders, payments, expenses, and reporting while identifying and correcting data-quality inconsistencies.",
       "Prepared recurring business and operational analyses to improve visibility into customer activity, payments, costs, and overall business performance.",
+    ],
+    summary:
+      "Analyzed financial and operational data for a manufacturing business, turning scattered records into the reporting leadership used to make decisions.",
+    highlights: [
+      "Analyzed financial, sales, customer-order, payment, and operational data to support budgeting and business-performance tracking.",
+      "Maintained and reconciled structured datasets for sales, customer orders, payments, and expenses, correcting data-quality inconsistencies along the way.",
+      "Prepared recurring business and operational analyses that improved visibility into customer activity, costs, and overall performance.",
     ],
   },
 ];

@@ -140,6 +140,13 @@ export const metricSchema = z.object({
   source: z.string().min(1, "every metric needs a source note"),
 });
 
+// Short professional narrative for the About section (Phase 5). Synthesized copy, not
+// resume text pasted verbatim — content-check still scans it (like every other module)
+// for placeholders, leaked paths, and exaggerated-seniority language.
+export const aboutSchema = z.object({
+  paragraphs: z.array(z.string().min(1)).min(2).max(4),
+});
+
 export const experienceSchema = z.object({
   id: z.string().min(1),
   // Verbatim job title. Never relabel a real title.
@@ -149,7 +156,19 @@ export const experienceSchema = z.object({
   start: yearMonthSchema,
   end: endDateSchema,
   employmentType: z.string().optional(),
+  // Verbatim resume bullets — the fidelity source. Never edited to sound bigger.
   bullets: z.array(z.string().min(1)).min(1),
+  // Portfolio-friendly synthesis of `bullets` (Phase 5 Step 5), not a verbatim repeat:
+  // one-sentence problem-space framing.
+  summary: z.string().min(1),
+  // 2-4 condensed, portfolio-styled restatements of what was done/how/impact.
+  highlights: z.array(z.string().min(1)).min(1).max(4),
+  // Optional standalone concrete metric, only when the resume genuinely supports one
+  // for this specific role (not restated from content/metrics.ts's Hero proof-strip set).
+  impact: z.string().optional(),
+  // Role-relevant technologies only (Phase 5 Step 11) — never every skill dumped onto
+  // every role. content-check cross-validates every label against content/skills.ts.
+  tech: z.array(z.string().min(1)).optional(),
 });
 
 export const architectureNodeSchema = z.object({
