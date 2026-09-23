@@ -1,0 +1,97 @@
+/**
+ * Cinematic opening (Phase 9.5). Every transition here is `opacity`/`transform`/
+ * `stroke-dashoffset` (CLAUDE.md §5 budget rule 1) driven by a single `data-phase`
+ * attribute the Intro component sets — no per-frame JS, same discipline as
+ * `web.css`'s NetworkMesh unfurl and `globals.css`'s `.js [data-reveal]` gate. The
+ * component itself never mounts this markup at all when reduced-motion is active or
+ * the intro is bypassed (see Intro.tsx), so there is no reduced-motion variant to
+ * write here — the "off" state is simply "not rendered."
+ */
+
+.intro-overlay {
+  transition: opacity var(--motion-duration-fast) var(--motion-ease);
+}
+
+.intro-overlay[data-phase="exiting"] {
+  opacity: 0;
+}
+
+/* Idle content (name/role/Connect/Skip) — present immediately, fades out the instant
+   the visitor activates Connect so attention shifts to the network forming. */
+.intro-idle {
+  transition:
+    opacity var(--motion-duration-fast) var(--motion-ease),
+    transform var(--motion-duration-fast) var(--motion-ease);
+}
+
+.intro-overlay[data-phase="connecting"] .intro-idle,
+.intro-overlay[data-phase="exiting"] .intro-idle {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+/* Network strands: opacity, not a stroke-dashoffset draw — deliberately simpler than
+   NetworkMesh.tsx's unfurl (CLAUDE.md §5 budget rule 1 still applies: only
+   opacity/transform are animated). A dash-length "draw" on a `<line>` inside a
+   `preserveAspectRatio="none"` container (needed so the network isn't letterboxed at
+   the intro overlay's own aspect ratio) did not render reliably hidden in testing;
+   opacity has no such cross-engine pitfall, and each strand still appears in visible
+   sequence via the stagger below, which is what actually reads as "network forming." */
+.intro-network__line {
+  opacity: 0;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease);
+}
+
+.intro-overlay[data-phase="connecting"] .intro-network__line,
+.intro-overlay[data-phase="exiting"] .intro-network__line {
+  opacity: 1;
+}
+
+.intro-network__node {
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity var(--motion-duration-fast) var(--motion-ease),
+    transform var(--motion-duration-fast) var(--motion-ease);
+}
+
+.intro-overlay[data-phase="connecting"] .intro-network__node,
+.intro-overlay[data-phase="exiting"] .intro-network__node {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.intro-network__hub {
+  opacity: 0;
+  transition:
+    opacity var(--motion-duration-fast) var(--motion-ease),
+    transform var(--motion-duration-fast) var(--motion-ease);
+}
+
+.intro-overlay[data-phase="connecting"] .intro-network__hub,
+.intro-overlay[data-phase="exiting"] .intro-network__hub {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+/* Device-appropriate Connect wording (Phase 9.5 Step 2) — a plain CSS media toggle
+   between two server-rendered spans, the same technique Header.tsx already uses for
+   monogram-vs-full-name, so no client JS is needed just to pick a string. */
+.intro-connect-touch {
+  display: inline;
+}
+
+.intro-connect-pointer {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .intro-connect-touch {
+    display: none;
+  }
+
+  .intro-connect-pointer {
+    display: inline;
+  }
+}
