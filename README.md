@@ -4,6 +4,8 @@ A Data Engineer portfolio built with Next.js (App Router), TypeScript, Tailwind 
 and Zod — and a reusable template for anyone who wants the same architecture with
 their own content.
 
+**Live Portfolio:** <https://bhanu-data-engineering-portfolio.vercel.app>
+
 > Rules and plan: [CLAUDE.md](CLAUDE.md) (permanent rules), [PLANNING.md](PLANNING.md)
 > (design system, architecture, and phase-by-phase decision log).
 
@@ -202,9 +204,13 @@ exactly what is and isn't reusable.
 
 The app is built to be static-export compatible: no API routes and no server-only
 runtime features, so it can deploy to Vercel, Netlify, Cloudflare Pages, or GitHub
-Pages without modification. There is currently no production deployment or domain
-for this specific site — that is a deliberate, separate decision, made only with
-explicit approval, and nothing here should be read as implying one exists yet.
+Pages without modification. This site is deployed on Vercel at
+<https://bhanu-data-engineering-portfolio.vercel.app> (no custom domain yet).
+
+The canonical site URL is set once, as `site.seo.url` in `content/site.ts`; the
+canonical link, `metadataBase`, Open Graph/Twitter URLs, JSON-LD, `robots.txt`, and
+`sitemap.xml` all derive from it. A fork deploying elsewhere changes that one value
+(or leaves it as `needsInput()`, in which case every absolute-URL field is omitted).
 
 ## License
 
