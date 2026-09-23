@@ -1,10 +1,14 @@
 import type { Leadership } from "@/types/content";
 
-/** Verbatim from the resume. Additional detail only if Bhanu supplies real facts. */
+/**
+ * Verbatim from the resume, plus the specific title Bhanu confirmed in Phase 7.5
+ * ("Vice President" → "Vice President of Programming" — GPSA has multiple VP roles).
+ * Additional detail only if Bhanu supplies real facts.
+ */
 export const leadership: Leadership[] = [
   {
     id: "gpsa-vice-president",
-    role: "Vice President",
+    role: "Vice President of Programming",
     org: "Graduate and Professional Student Association (GPSA)",
     institution: "Cleveland State University",
     location: "Cleveland, OH",

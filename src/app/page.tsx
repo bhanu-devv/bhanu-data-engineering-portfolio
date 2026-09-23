@@ -5,6 +5,9 @@ import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
 import { Certifications } from "@/components/sections/Certifications";
 import { Education } from "@/components/sections/Education";
+import { LeadershipAwards } from "@/components/sections/LeadershipAwards";
+import { Recommendations } from "@/components/sections/Recommendations";
+import { GithubLinks } from "@/components/sections/GithubLinks";
 
 export default function Home() {
   return (
@@ -16,6 +19,9 @@ export default function Home() {
       <Skills />
       <Certifications />
       <Education />
+      <LeadershipAwards />
+      <Recommendations />
+      <GithubLinks />
     </main>
   );
 }

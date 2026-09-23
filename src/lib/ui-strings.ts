@@ -19,4 +19,8 @@ export const uiStrings = {
   caseStudyImpactHeading: "Impact",
   // Certifications (Phase 7).
   verifyCredential: "Verify credential",
+  // GitHub / Links (Phase 7.5). Deliberately "View ... Profile", not a stats claim
+  // ("Explore 20 repositories") — Step 9 bans exactly that without a real data source.
+  viewGithubProfile: "View GitHub Profile",
+  viewLinkedinProfile: "View LinkedIn Profile",
 } as const;
