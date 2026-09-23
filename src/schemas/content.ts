@@ -109,6 +109,15 @@ export const siteSchema = z.object({
     url: maybeSchema(z.string().url()),
     ogImage: z.string().optional(),
   }),
+  // Optional link to this site's own public source repository, shown quietly in the
+  // GitHub / Links section. Omitted entirely when absent — never a guessed URL.
+  sourceRepository: z
+    .object({
+      label: z.string().min(1),
+      description: z.string().min(1),
+      url: z.string().url().startsWith("https://github.com/"),
+    })
+    .optional(),
   // Source image is never edited; grayscale/frame treatment happens in CSS at render time.
   portrait: z.object({
     src: z.string().min(1),

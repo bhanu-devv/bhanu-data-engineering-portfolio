@@ -23,6 +23,7 @@ export const uiStrings = {
   // ("Explore 20 repositories") — Step 9 bans exactly that without a real data source.
   viewGithubProfile: "View GitHub Profile",
   viewLinkedinProfile: "View LinkedIn Profile",
+  viewSource: "View source on GitHub",
   // Cinematic opening (Phase 9.5). Device wording differs (touch vs. pointer-fine),
   // toggled by CSS media query, not JS — see intro.css.
   introRoleLabel: "Data Engineer",

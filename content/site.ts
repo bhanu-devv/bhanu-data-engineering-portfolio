@@ -37,6 +37,13 @@ export const site: Site = {
     url: "https://bhanu-data-engineering-portfolio.vercel.app",
   },
 
+  // This portfolio's own public repository (confirmed by Bhanu after the Phase 11 publish).
+  sourceRepository: {
+    label: "Portfolio Source",
+    description: "Next.js · TypeScript · Tailwind CSS",
+    url: "https://github.com/bhanu-devv/bhanu-data-engineering-portfolio",
+  },
+
   portrait: {
     src: "/images/profile/bhanu-portrait.png",
     alt: "Illustrated portrait of Bhanudeepak Nagumothu",

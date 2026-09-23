@@ -3,6 +3,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Surface } from "@/components/ui/Surface";
 import { Reveal } from "@/components/ui/Reveal";
 import { Node } from "@/components/web/Node";
+import { site } from "@/lib/content";
 import { getPublicSocials } from "@/lib/content-selectors";
 import { uiStrings } from "@/lib/ui-strings";
 import type { Social } from "@/types/content";
@@ -28,12 +29,13 @@ const ACTION_LABEL: Record<string, string> = {
  * — unlike Phase 6's project cards, which needed a separate "View Case Study" control
  * specifically because they had other real actions alongside it).
  *
- * Project-level GitHub links are untouched (Phase 6 policy, PLANNING.md §9.4/D-log):
- * none of the 3 real projects has an approved public repository URL, and this section
- * does not change that — it links to the GitHub *profile* only.
+ * Project-level GitHub links are untouched (Phase 6 policy, PLANNING.md §9.4/D-log).
+ * The one repository linked here is this site's own source (`site.sourceRepository`),
+ * rendered as a quieter card after the profile links, and only when content sets it.
  */
 export function GithubLinks() {
   const socials = getPublicSocials();
+  const source = site.sourceRepository;
   if (socials.length === 0) return null;
 
   return (
@@ -81,6 +83,33 @@ export function GithubLinks() {
             </a>
           </Reveal>
         ))}
+        {source && (
+          <Reveal delayMs={socials.length * 60}>
+            <a
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={uiStrings.viewSource}
+              className="focus-ring block"
+            >
+              <Surface chamfered tilt className="h-full p-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Node size="sm" />
+                    <p className="font-display text-heading text-foreground">{source.label}</p>
+                  </div>
+                  <span aria-hidden="true" className="text-muted">
+                    ↗
+                  </span>
+                </div>
+                <p className="mt-2 font-mono text-label text-muted-foreground">{source.description}</p>
+                <span className="mt-4 inline-block font-mono text-label text-muted">
+                  {uiStrings.viewSource} <span aria-hidden="true">→</span>
+                </span>
+              </Surface>
+            </a>
+          </Reveal>
+        )}
       </div>
     </SectionShell>
   );
