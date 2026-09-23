@@ -51,6 +51,7 @@
   --layout-radius-sm: 4px;
   --layout-radius-md: 8px;
   --layout-chamfer: 16px; /* clip-path chamfer size, PLANNING §5.3 "angular language" */
+  --header-height: 64px; /* the fixed Header's height — anchor scroll offset and the mobile sheet's top inset both read this one value (Phase 9) */
 }
 
 @media (min-width: 640px) {
@@ -74,6 +75,10 @@
   --color-background: var(--palette-void);
   --color-surface: var(--palette-graphite);
   --color-surface-elevated: var(--palette-graphite-hi);
+  /* Header only (Phase 9): "translucent carbon" per PLANNING §9.2 — distinct from
+     --color-surface (graphite, used for cards) so the fixed nav reads as its own
+     raised plane above the page, not another card. */
+  --color-header: var(--palette-carbon);
   --color-foreground: var(--palette-offwhite);
   --color-muted: var(--palette-silver);
   --color-muted-foreground: var(--palette-mist);

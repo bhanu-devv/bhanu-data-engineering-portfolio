@@ -10,6 +10,14 @@
 
 html {
   color-scheme: dark; /* the site is a fixed dark theme by design, not a toggle */
+  scroll-padding-top: var(--header-height); /* keeps anchor jumps/smooth-scroll from landing headings under the fixed Header (Phase 9 Step 7) */
+}
+
+/* Same offset for the non-smooth-scroll jump case (browsers honor scroll-margin-top on
+   the target itself even without scroll-padding-top support, and reduced-motion users
+   get no smooth scroll at all, so both properties are needed). */
+section[id] {
+  scroll-margin-top: var(--header-height);
 }
 
 /* Smooth scrolling only for users who haven't asked to reduce motion
