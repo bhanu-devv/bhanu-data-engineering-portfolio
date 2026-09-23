@@ -8,6 +8,8 @@ import { Education } from "@/components/sections/Education";
 import { LeadershipAwards } from "@/components/sections/LeadershipAwards";
 import { Recommendations } from "@/components/sections/Recommendations";
 import { GithubLinks } from "@/components/sections/GithubLinks";
+import { Resume } from "@/components/sections/Resume";
+import { Contact } from "@/components/sections/Contact";
 
 export default function Home() {
   return (
@@ -22,6 +24,8 @@ export default function Home() {
       <LeadershipAwards />
       <Recommendations />
       <GithubLinks />
+      <Resume />
+      <Contact />
     </main>
   );
 }

@@ -14,4 +14,9 @@ export const resume: ResumeConfig = {
   title: "Bhanudeepak Nagumothu Resume",
   downloadName: "Bhanudeepak-Nagumothu-Resume.pdf",
   inlineViewer: true,
+  // Deliberately different wording from site.positioning (not a repeat of the Hero
+  // statement) — every fact still traces to already-validated content (Professional
+  // Summary, content/education.ts's M.S. entry).
+  summary:
+    "Data Engineer with 4+ years of combined experience across data engineering, database development, automation, and analytics — currently building an Azure-based data platform while completing a Master's in Information Systems.",
 };

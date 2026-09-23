@@ -9,4 +9,6 @@ export const resume: ResumeConfig = {
   title: "Jordan A. Rivera Resume",
   downloadName: "Jordan-Rivera-Resume.pdf",
   inlineViewer: true,
+  summary:
+    "Data Engineer with experience across data engineering, streaming pipelines, and warehouse automation — currently leading a cloud lakehouse migration.",
 };

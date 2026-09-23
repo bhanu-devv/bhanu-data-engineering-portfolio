@@ -128,6 +128,10 @@ export const resumeConfigSchema = z.object({
   downloadName: z.string().min(1),
   label: z.string().optional(),
   inlineViewer: z.boolean(),
+  // A short, standalone blurb for the Resume section (Phase 8 Step 5) — distinct
+  // wording from `site.positioning`, but every fact in it must still trace to already
+  // -validated content elsewhere (experience/education/site).
+  summary: z.string().min(1),
 });
 
 export const metricSchema = z.object({

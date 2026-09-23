@@ -7,13 +7,6 @@
 # source documents. See CLAUDE.md §3.
 reference/
 
-# --- Resume PDF gate (CLAUDE.md §2 rule 8, PLANNING.md §8.5) -----------------
-# The resume PDF contains a personal phone number. Whether the PUBLIC PDF
-# includes it is Bhanu's decision, made later. Until then no PDF is tracked, so
-# it cannot reach a pushed repository by accident. Once Bhanu decides, delete
-# the next line and commit public/resume/bhanu-resume.pdf deliberately.
-public/resume/*.pdf
-
 # --- Dependencies and build output -------------------------------------------
 node_modules/
 .pnp

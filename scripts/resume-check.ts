@@ -137,7 +137,7 @@ const absolutePath = path.join(ROOT, "public", resume.file);
 const relativeDisplay = path.join("public", resume.file);
 
 if (!existsSync(absolutePath)) {
-  err(relativeDisplay, "the resume PDF is missing locally. Copy the approved resume to this path (never from a repository that will be pushed until Bhanu has decided on the public PDF's contents — PLANNING.md §8.5).");
+  err(relativeDisplay, "the resume PDF is missing locally. Copy the approved resume to this path — it is tracked in Git and expected to be present (decision 19, resolved in Phase 8; PLANNING.md §8.5).");
 } else {
   const stats = statSync(absolutePath);
   if (!stats.isFile()) {
