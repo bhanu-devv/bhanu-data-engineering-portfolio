@@ -26,9 +26,16 @@ export function ProjectCard({ project, flagship = false }: ProjectCardProps) {
   const headlineMetric = metrics[0];
 
   return (
-    <Surface chamfered tilt className={flagship ? "flex h-full flex-col p-8 lg:p-10" : "flex h-full flex-col p-6"}>
+    <Surface
+      chamfered
+      tilt
+      className={`project-card ${flagship ? "flex h-full flex-col p-8 lg:p-10" : "flex h-full flex-col p-6"}`}
+    >
       <div className="flex items-center justify-between gap-3">
         <ProjectStatusBadge status={project.status} />
+        {/* A quiet hover/focus response (Phase 9.7 Part 8) — a small activation dot,
+            not a literal traveling animation; opacity/transform only, no layout. */}
+        <span aria-hidden="true" className="project-card__pulse h-1.5 w-1.5 rounded-full bg-accent" />
       </div>
 
       <h3 className={`mt-4 font-display text-foreground text-balance ${flagship ? "text-display" : "text-heading"}`}>

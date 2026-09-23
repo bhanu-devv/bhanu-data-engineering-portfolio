@@ -1,4 +1,6 @@
-import { Fragment } from "react";
+"use client";
+
+import { Fragment, useEffect, useState } from "react";
 import { Node } from "@/components/web/Node";
 import type { ArchitectureNode } from "@/types/content";
 
@@ -24,10 +26,28 @@ interface ArchitectureDiagramProps {
  * `ExperienceThread`'s mobile-safe vertical connector), a horizontal flow at `sm`+
  * (matching `About`'s pipeline strand) — both already Playwright-verified patterns,
  * reused here rather than inventing a third layout for a variable node count.
+ *
+ * One-shot connector activation on mount (Phase 9.7 Part 9): connectors render at
+ * partial opacity and brighten once, right after mount — this component only ever
+ * mounts when the case-study modal opens (it's lazy-loaded inside
+ * `ProjectModalContent`), so "on mount" already means "on modal open," with no
+ * separate open/close plumbing needed. A single state flip, not a continuous loop —
+ * `"use client"` only for that one `useEffect`.
  */
 export function ArchitectureDiagram({ nodes }: ArchitectureDiagramProps) {
+  const [activated, setActivated] = useState(false);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setActivated(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   return (
-    <div role="list" className="flex flex-col items-stretch sm:flex-row sm:items-center">
+    <div
+      role="list"
+      data-activated={activated}
+      className="architecture-diagram flex flex-col items-stretch sm:flex-row sm:items-center"
+    >
       {nodes.map((node, i) => (
         <Fragment key={node.id}>
           <div role="listitem" className="flex flex-col items-center gap-1.5 sm:flex-1 sm:px-1">
@@ -35,7 +55,11 @@ export function ArchitectureDiagram({ nodes }: ArchitectureDiagramProps) {
             <span className="font-mono text-label text-muted text-center leading-tight">{node.label}</span>
           </div>
           {i < nodes.length - 1 && (
-            <span aria-hidden="true" className="my-2 h-6 w-px self-center bg-border sm:my-0 sm:h-px sm:w-auto sm:flex-1 sm:self-auto" />
+            <span
+              aria-hidden="true"
+              style={{ transitionDelay: `${i * 80}ms` }}
+              className="architecture-diagram__connector my-2 h-6 w-px self-center bg-border sm:my-0 sm:h-px sm:w-auto sm:flex-1 sm:self-auto"
+            />
           )}
         </Fragment>
       ))}

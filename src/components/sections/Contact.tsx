@@ -3,6 +3,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Surface } from "@/components/ui/Surface";
 import { Reveal } from "@/components/ui/Reveal";
 import { Node } from "@/components/web/Node";
+import { NetworkMesh } from "@/components/web/NetworkMesh";
 import { site } from "@/lib/content";
 import { getPublicSocials } from "@/lib/content-selectors";
 import { resolve } from "@/lib/needs-input";
@@ -25,7 +26,17 @@ export function Contact() {
   const email = resolve(site.contact.email);
 
   return (
-    <SectionShell id="contact" className="border-t border-border-subtle">
+    <SectionShell id="contact" className="relative overflow-hidden border-t border-border-subtle">
+      {/* Ambient backdrop (Phase 9.7 Parts 3/11) — the network's closing atmosphere
+          behind the final "connection → conversation" node above. Static, no
+          continuous loop. */}
+      <NetworkMesh
+        seed={55}
+        radials={7}
+        rings={2}
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-[0.14]"
+      />
+
       <Reveal>
         <SectionHeading
           id="contact-heading"

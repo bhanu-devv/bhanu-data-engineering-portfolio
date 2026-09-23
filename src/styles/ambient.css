@@ -1,0 +1,84 @@
+/**
+ * Ambient motion and interaction polish (Phase 9.7). Everything here is
+ * `opacity`/`transform` (CLAUDE.md §5 budget rule 1) and either pointer-driven (exempt
+ * from the "one ambient loop" rule — it only moves in response to real pointer
+ * movement, budget rule 3) or a one-shot, non-looping transition (a hover/focus state
+ * change, or a fade-in that plays once on mount) — nothing here is a second
+ * continuous ambient loop competing with `Node`'s existing "live" pulse (web.css),
+ * which stays the site's one permitted autonomous loop.
+ */
+
+/* --- Cursor-following light (Parts 4-6) ---------------------------------------- */
+
+.cursor-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 1; /* above the void background, safely below Header (z-50) and the Intro overlay (z-60) */
+  pointer-events: none;
+  opacity: 0; /* appears only after the first real pointer move — see CursorGlow.tsx */
+  transition: opacity var(--motion-duration-entrance) var(--motion-ease);
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  /* Mostly neutral silver illumination with a much smaller, much fainter crimson
+     core — "soft silver illumination + very restrained crimson energy" (Part 6), kept
+     low enough that it never measurably affects text contrast underneath it. */
+  background:
+    radial-gradient(320px circle at var(--pointer-x) var(--pointer-y), color-mix(in srgb, var(--color-glow) 7%, transparent), transparent 70%),
+    radial-gradient(620px circle at var(--pointer-x) var(--pointer-y), color-mix(in srgb, var(--color-muted) 5%, transparent), transparent 70%);
+}
+
+/* --- Project card hover/focus response (Part 8) --------------------------------- */
+
+.project-card {
+  transition: border-color var(--motion-duration-fast) var(--motion-ease);
+}
+
+.project-card:hover,
+.project-card:focus-within {
+  border-color: var(--color-accent-hover);
+}
+
+.project-card__pulse {
+  opacity: 0;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease);
+}
+
+.project-card:hover .project-card__pulse,
+.project-card:focus-within .project-card__pulse {
+  opacity: 1;
+}
+
+/* --- Architecture diagram: one-shot activation on modal open (Part 9) ----------- */
+
+.architecture-diagram__connector {
+  opacity: 0.3;
+  transition: opacity var(--motion-duration-entrance) var(--motion-ease);
+}
+
+.architecture-diagram[data-activated="true"] .architecture-diagram__connector {
+  opacity: 1;
+}
+
+/* --- Skills: a hovered/focused group's own hub node brightens (Part 10) -------- */
+
+.skills-hub {
+  transition: border-color var(--motion-duration-fast) var(--motion-ease);
+}
+
+.skills-hub:hover,
+.skills-hub:focus-within {
+  border-color: var(--color-accent-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-glow {
+    display: none; /* belt-and-suspenders: CursorGlow.tsx already never mounts this under reduced motion */
+  }
+
+  .project-card,
+  .project-card__pulse,
+  .architecture-diagram__connector,
+  .skills-hub {
+    transition: none;
+  }
+}

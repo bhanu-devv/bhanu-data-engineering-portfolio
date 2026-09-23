@@ -5,6 +5,7 @@
 @import "../styles/dialog.css";
 @import "../styles/intro.css";
 @import "../styles/disclosure.css";
+@import "../styles/ambient.css";
 
 /* ---------------------------------------------------------------------------
    Base document styles (CLAUDE.md §4, §5, §8).

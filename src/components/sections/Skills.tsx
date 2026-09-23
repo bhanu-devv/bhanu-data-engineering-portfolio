@@ -5,6 +5,7 @@ import { Surface } from "@/components/ui/Surface";
 import { Reveal } from "@/components/ui/Reveal";
 import { TechTag } from "@/components/ui/TechTag";
 import { Node } from "@/components/web/Node";
+import { NetworkMesh } from "@/components/web/NetworkMesh";
 import { skills } from "@/lib/content";
 import { getEvidencedSkills } from "@/lib/content-selectors";
 
@@ -21,7 +22,15 @@ export function Skills() {
   const evidenced = getEvidencedSkills();
 
   return (
-    <SectionShell id="skills" className="border-t border-border-subtle">
+    <SectionShell id="skills" className="relative overflow-hidden border-t border-border-subtle">
+      {/* Ambient backdrop (Phase 9.7 Part 3) — static, no continuous loop. */}
+      <NetworkMesh
+        seed={34}
+        radials={8}
+        rings={3}
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-[0.14]"
+      />
+
       <Reveal>
         <SectionHeading
           id="skills-heading"
@@ -45,7 +54,7 @@ export function Skills() {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {skills.map((group, i) => (
           <Reveal key={group.id} delayMs={i * 60}>
-            <Surface chamfered tilt className="h-full p-6">
+            <Surface chamfered tilt className="skills-hub h-full p-6">
               <div className="flex items-center gap-2">
                 <Node size="sm" />
                 <h3 className="font-display text-heading text-foreground">{group.name}</h3>

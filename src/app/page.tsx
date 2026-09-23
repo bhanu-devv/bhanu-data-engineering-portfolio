@@ -1,4 +1,5 @@
 import { Intro } from "@/components/intro/Intro";
+import { CursorGlow } from "@/components/effects/CursorGlow";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/sections/Hero";
@@ -18,6 +19,7 @@ export default function Home() {
   return (
     <>
       <Intro />
+      <CursorGlow />
       <Header />
       <main id="main" className="relative overflow-hidden">
         <Hero />

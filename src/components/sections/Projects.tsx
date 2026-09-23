@@ -2,6 +2,7 @@ import { SectionShell } from "@/components/ui/SectionShell";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { Node } from "@/components/web/Node";
+import { NetworkMesh } from "@/components/web/NetworkMesh";
 import { ProjectCard } from "@/components/web/ProjectCard";
 import { ProjectsGrid } from "@/components/sections/ProjectsGrid";
 import { getFeaturedProjects } from "@/lib/content-selectors";
@@ -20,7 +21,17 @@ export function Projects() {
   const [flagship, ...rest] = featured;
 
   return (
-    <SectionShell id="projects" className="border-t border-border-subtle">
+    <SectionShell id="projects" className="relative overflow-hidden border-t border-border-subtle">
+      {/* Ambient backdrop (Phase 9.7 Part 3: "Projects transition area") — static,
+          no continuous loop (NetworkMesh draws in once then stops; web.css), very low
+          opacity so it never competes with the cards themselves. */}
+      <NetworkMesh
+        seed={21}
+        radials={9}
+        rings={2}
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-[0.14]"
+      />
+
       <Reveal>
         <SectionHeading
           id="projects-heading"
