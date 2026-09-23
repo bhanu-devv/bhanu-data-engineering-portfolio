@@ -1,0 +1,45 @@
+/**
+ * Accessible modal dialog (Phase 6 Steps 9-10), built on the native <dialog> element
+ * rather than a hand-rolled focus trap or an added library (CLAUDE.md §7 "prefer the
+ * platform"). `showModal()` gives a real focus trap, Escape-to-close, and — per the
+ * WHATWG dialog spec — focus restoration to the previously-focused element on close,
+ * all natively and more robustly than reimplementing the same behavior in JS. This file
+ * only resets the UA default chrome (a bordered white box, centered by the browser) and
+ * applies the site's own dimensional surface language; see src/components/ui/Dialog.tsx
+ * for the React wrapper that drives `open`/`close()`.
+ */
+
+dialog.dialog {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  max-width: min(640px, calc(100vw - 2 * var(--layout-gutter)));
+  width: 100%;
+  height: fit-content;
+  max-height: calc(100vh - 2 * var(--layout-gutter));
+  /* The UA stylesheet's own `margin: auto` centering assumes the dialog's default
+     `width`/`height: fit-content` intrinsic sizing; overriding `width` above breaks
+     that assumption (found via Playwright QA — the panel pinned to the left edge
+     instead of centering), so centering is re-established explicitly here. */
+  position: fixed;
+  inset: 0;
+  margin: auto;
+}
+
+dialog.dialog:not([open]) {
+  display: none;
+}
+
+/* Static, opaque graphite — no backdrop-filter blur (CLAUDE.md §5 budget rule 5
+   reserves backdrop-filter for the nav). */
+dialog.dialog::backdrop {
+  background: color-mix(in srgb, var(--palette-void) 78%, transparent);
+}
+
+/* The scrollable inner panel — kept separate from the <dialog> box itself so the
+   chamfered clip-path (`.surface--chamfered`, depth.css) never clips a scrollbar. */
+.dialog__panel {
+  max-height: min(85vh, 760px);
+  overflow-y: auto;
+}

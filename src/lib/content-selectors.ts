@@ -18,8 +18,9 @@ import {
   leadership,
   awards,
   navigation,
+  metrics,
 } from "@/lib/content";
-import type { NavSection, Project, Recommendation, Social } from "@/types/content";
+import type { Metric, NavSection, Project, Recommendation, Social } from "@/types/content";
 
 /** Only recommendations Bhanu has explicitly approved for publishing (CLAUDE.md §2 rule 5). */
 export function getApprovedRecommendations(): Recommendation[] {
@@ -93,4 +94,21 @@ export function getRenderableNavigation(): NavSection[] {
  */
 export function getSectionHref(id: NavSection["id"]): string {
   return `#${id}`;
+}
+
+/**
+ * The in-page hash used to open a project's case-study modal (Phase 6), e.g.
+ * `#project=csu-utilities-lakehouse` — matches PLANNING.md §9.4's locked "hash-synced
+ * state" approach (D5): the browser's own Back button closes the modal, no client
+ * router or intercepting route needed for a purely client-side, static-export site.
+ */
+export function getProjectHref(slug: Project["slug"]): string {
+  return `#project=${slug}`;
+}
+
+/** The real `content/metrics.ts` records a project's `metricIds` point to, in order. */
+export function getProjectMetrics(project: Project): Metric[] {
+  if (!project.metricIds) return [];
+  const bySlug = new Map(metrics.map((metric) => [metric.id, metric]));
+  return project.metricIds.map((id) => bySlug.get(id)).filter((metric): metric is Metric => metric !== undefined);
 }

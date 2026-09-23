@@ -457,6 +457,57 @@ async function main() {
   });
 
   // -------------------------------------------------------------------------
+  // 8. Project structural integrity (Phase 6)
+  // -------------------------------------------------------------------------
+
+  const knownMetricIds = new Set(content.metrics.map((m) => m.id));
+
+  content.projects.forEach((project, i) => {
+    const loc = `${fileFor("projects")} → projects[${i}] (${project.slug})`;
+
+    // 8a. metricIds must reference a real content/metrics.ts record.
+    for (const metricId of project.metricIds ?? []) {
+      if (!knownMetricIds.has(metricId)) {
+        err(`${loc}.metricIds`, `"${metricId}" does not match any id in content/metrics.ts — fix the id or add the metric there first.`);
+      }
+    }
+
+    // 8b. An in-progress project carries no outcome metrics (CLAUDE.md §2 rule 2).
+    if (project.status === "in-progress" && (project.metricIds?.length ?? 0) > 0) {
+      err(loc, `status is "in-progress" but metricIds is non-empty — an in-progress project must not claim delivered outcome metrics (CLAUDE.md §2 rule 2).`);
+    }
+
+    // 8c. CRITICAL (Phase 6 Step 5): an in-progress project may not claim any
+    //     "implemented" milestone — that would present planned/active work as done.
+    if (project.status === "in-progress") {
+      const implementedLabels = (project.caseStudy?.milestones ?? []).filter((m) => m.state === "implemented");
+      if (implementedLabels.length > 0) {
+        err(
+          `${loc}.caseStudy.milestones`,
+          `status is "in-progress" but ${implementedLabels.length} milestone(s) are marked "implemented" (${implementedLabels.map((m) => `"${m.label}"`).join(", ")}) — never upgrade in-progress work to implemented.`,
+        );
+      }
+    }
+
+    // 8d. architecture.edges may only reference ids present in this project's own
+    //     architecture.nodes — a typo'd id would silently draw a broken connector.
+    if (project.architecture) {
+      const nodeIds = new Set(project.architecture.nodes.map((n) => n.id));
+      for (const [from, to] of project.architecture.edges) {
+        if (!nodeIds.has(from) || !nodeIds.has(to)) {
+          err(`${loc}.architecture.edges`, `edge ["${from}", "${to}"] references a node id not present in this project's architecture.nodes.`);
+        }
+      }
+    }
+
+    // 8e. A GitHub link must actually be a github.com URL, not just any URL (the
+    //     schema's z.string().url() alone would accept anything well-formed).
+    if (project.links?.github && !project.links.github.startsWith("https://github.com/")) {
+      err(`${loc}.links.github`, `"${project.links.github}" does not look like a github.com repository URL.`);
+    }
+  });
+
+  // -------------------------------------------------------------------------
   // Report
   // -------------------------------------------------------------------------
 

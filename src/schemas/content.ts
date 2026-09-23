@@ -176,6 +176,30 @@ export const architectureNodeSchema = z.object({
   label: z.string().min(1),
 });
 
+// A single architecture component/technique's build state (Phase 6 Step 4/5: "never
+// blur implemented vs in-progress vs planned"). content-check.ts enforces the CRITICAL
+// rule from the brief in code, not just convention: an "in-progress" project may not
+// claim any "implemented" milestone.
+export const projectMilestoneStateSchema = z.enum(["implemented", "in-progress", "planned"]);
+
+export const projectMilestoneSchema = z.object({
+  label: z.string().min(1),
+  state: projectMilestoneStateSchema,
+});
+
+// Structured case-study content (Phase 6 Step 12) — kept separate from `summary`/
+// `bullets` so the richer modal view has real fields to render instead of prose baked
+// into a component. `validation` is optional: not every project's bullets describe a
+// distinct validation/reliability strategy worth calling out on its own.
+export const caseStudySchema = z.object({
+  problem: z.string().min(1),
+  approach: z.string().min(1),
+  // "What I personally did" (Phase 6 Step 9).
+  responsibility: z.string().min(1),
+  validation: z.string().min(1).optional(),
+  milestones: z.array(projectMilestoneSchema).min(1),
+});
+
 export const projectImageSchema = z.object({
   src: z.string().min(1),
   alt: z.string().min(1),
@@ -198,10 +222,13 @@ export const projectSchema = z.object({
   // Custom sanitized diagram data (Phase 6). Labels: PLANNING.md §9.4.
   architecture: z
     .object({
-      nodes: z.array(architectureNodeSchema),
+      nodes: z.array(architectureNodeSchema).min(1),
       edges: z.array(z.tuple([z.string(), z.string()])),
     })
     .optional(),
+  // The modal/case-study view's structured content (Phase 6). Optional so a future
+  // project can exist with just a card until its case study is written.
+  caseStudy: caseStudySchema.optional(),
   // Only real, Bhanu-approved URLs. Never invented.
   links: z
     .object({

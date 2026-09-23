@@ -25,6 +25,8 @@ import type {
   aboutSchema,
   experienceSchema,
   architectureNodeSchema,
+  projectMilestoneSchema,
+  caseStudySchema,
   projectImageSchema,
   projectSchema,
   skillGroupSchema,
@@ -52,6 +54,8 @@ export type Metric = z.infer<typeof metricSchema>;
 export type About = z.infer<typeof aboutSchema>;
 export type Experience = z.infer<typeof experienceSchema>;
 export type ArchitectureNode = z.infer<typeof architectureNodeSchema>;
+export type ProjectMilestone = z.infer<typeof projectMilestoneSchema>;
+export type CaseStudy = z.infer<typeof caseStudySchema>;
 export type ProjectImage = z.infer<typeof projectImageSchema>;
 export type Project = z.infer<typeof projectSchema>;
 export type SkillGroup = z.infer<typeof skillGroupSchema>;
