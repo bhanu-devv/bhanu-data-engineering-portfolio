@@ -4,15 +4,19 @@ interface ProjectStatusBadgeProps {
   status: Project["status"];
 }
 
+// "Current Build" (Phase 9.6 Part 2), not "In Progress"/"Ongoing Project": a status
+// enum value of "in-progress" still means "not complete" underneath — the enum itself
+// is untouched, so flipping this project to "complete" later needs no schema or label
+// change, only the one `status:` value in content/projects.ts.
 const LABEL: Record<Project["status"], string> = {
-  "in-progress": "In Progress",
+  "in-progress": "Current Build",
   complete: "Complete",
 };
 
 /**
  * A professional, restrained status marker (Phase 6 Step 4) — never a plain color
  * dot: state is also carried by the text label itself, never by color alone (CLAUDE.md
- * §8). "In Progress" is the one status that uses crimson (the same "active/current"
+ * §8). "Current Build" is the one status that uses crimson (the same "active/current"
  * convention as Experience's live node); "Complete" stays neutral steel, keeping the
  * section's crimson budget to this single badge on the flagship card.
  */

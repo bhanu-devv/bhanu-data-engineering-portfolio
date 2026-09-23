@@ -151,6 +151,15 @@ export const aboutSchema = z.object({
   paragraphs: z.array(z.string().min(1)).min(2).max(4),
 });
 
+// A named, readable group of detail lines (Phase 9.6 Part 4: "use readable grouping...
+// do not simply paste resume bullets into a hidden container"). Shared by Experience's
+// and Leadership's expanded/inline-disclosure content — both are the same shape of
+// problem ("more detail than the collapsed card, organized under short headings").
+export const detailGroupSchema = z.object({
+  heading: z.string().min(1),
+  items: z.array(z.string().min(1)).min(1),
+});
+
 export const experienceSchema = z.object({
   id: z.string().min(1),
   // Verbatim job title. Never relabel a real title.
@@ -173,6 +182,11 @@ export const experienceSchema = z.object({
   // Role-relevant technologies only (Phase 5 Step 11) — never every skill dumped onto
   // every role. content-check cross-validates every label against content/skills.ts.
   tech: z.array(z.string().min(1)).optional(),
+  // Phase 9.6 Part 4: the role's inline-disclosure detail, grouped under short
+  // headings — every item still traces to the same approved `bullets`/`highlights`
+  // this role already has, just organized for a reader who asked for more, not new
+  // facts. Optional: a role can exist without a Part-4-style expansion.
+  expanded: z.array(detailGroupSchema).min(1).optional(),
 });
 
 export const architectureNodeSchema = z.object({
@@ -295,11 +309,26 @@ export const leadershipSchema = z.object({
   start: yearMonthSchema,
   end: endDateSchema,
   bullets: z.array(z.string().min(1)).min(1),
+  // Phase 9.6 Part 9: a concise 1-2 sentence collapsed description, distinct from
+  // `bullets` (the resume's own verbatim fidelity source) — the same summary/detail
+  // split Experience already has.
+  summary: z.string().min(1).optional(),
+  // A short, supported scope figure ("100+ graduate students"), shown collapsed only
+  // when it fits cleanly (Part 9) — never an invented count.
+  scope: z.string().optional(),
+  expanded: z.array(detailGroupSchema).min(1).optional(),
 });
 
 export const recommendationSchema = z.object({
   id: z.string().min(1),
   quote: z.string().min(1),
+  // A short pull-quote shown in the collapsed card (Phase 9.6 Part 11) — an exact
+  // excerpt of `quote`, never a paraphrase presented as a quote. Falls back to the
+  // full `quote` if a recommendation doesn't set one.
+  excerpt: z.string().min(1).optional(),
+  // A factual, clearly-labeled-as-summary sentence of what the recommendation praised
+  // (Part 11) — prose, never rendered inside quotation marks or blockquote/cite.
+  summary: z.string().min(1).optional(),
   author: z.string().min(1),
   role: z.string().min(1),
   org: z.string().min(1),

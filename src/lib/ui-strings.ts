@@ -29,4 +29,10 @@ export const uiStrings = {
   introConnectTouch: "Tap to connect",
   introConnectPointer: "Click to connect",
   introSkip: "Skip intro",
+  // Recommendations (Phase 9.6 Parts 10-12). "Manager Recommendation" is a role-type
+  // label, not the author's name/title (those come from content) — generic chrome
+  // that would read the same for any future direct-manager recommendation.
+  recommendationLabel: "Manager Recommendation",
+  readFullRecommendation: "Read full recommendation",
+  recommendationSummaryLabel: "Summary",
 } as const;

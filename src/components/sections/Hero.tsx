@@ -8,11 +8,12 @@ import { site, metrics, heroNetwork } from "@/lib/content";
 import { getPublicSocials, getSectionHref } from "@/lib/content-selectors";
 import { getResumeAsset } from "@/lib/resume";
 
-// The four most recruiter-relevant, non-overlapping resume metrics (Phase 4 Step 7).
-// "170+ monthly bill-related items" is deliberately left out — it restates the same
-// scope "20+ campus buildings" already covers, and a proof strip reads better as
-// distinct facts than as two sizes of the same fact.
-const PROOF_METRIC_IDS = ["campus-buildings", "energy-star-records", "energy-star-prep", "steam-bill-extraction"];
+// The four proof-strip items (Phase 9.6 Part 1 — revised from Phase 4's original
+// set): the Azure platform's scope now leads, combining what were previously two
+// separate "campus buildings" / "monthly bill-related items" entries into one
+// compound value, so the strip represents the current Azure/data-platform work
+// without growing past four items.
+const PROOF_METRIC_IDS = ["azure-platform-scope", "energy-star-records", "energy-star-prep", "steam-bill-extraction"];
 
 /**
  * The Hero section (Phase 4). Asymmetric composition: identity, positioning, and

@@ -22,6 +22,28 @@ export const experience: Experience[] = [
     ],
     impact: "Unifies data across 12+ regional warehouses.",
     tech: ["AWS", "Databricks", "Delta Lake", "Redshift"],
+    // Shows the "View full experience" inline-disclosure shape (Phase 9.6 Part 4) —
+    // grouped detail behind the collapsed card, not a flat bullet dump.
+    expanded: [
+      {
+        heading: "Platform architecture",
+        items: [
+          "Designed a Bronze/Silver/Gold lakehouse layout separating raw warehouse feeds, validated data, and business-ready reporting tables.",
+        ],
+      },
+      {
+        heading: "Pipelines & automation",
+        items: [
+          "Built streaming ingestion pipelines that cut reporting lag from roughly two days to about ten minutes.",
+        ],
+      },
+      {
+        heading: "Data quality",
+        items: [
+          "Introduced data-quality checks catching duplicate orders, missing warehouse scans, and mismatched SKUs before they reach dashboards.",
+        ],
+      },
+    ],
   },
   {
     id: "prairie-analytics-data-engineer",

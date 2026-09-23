@@ -24,6 +24,15 @@ interface ExperienceThreadProps {
  * responsibility → current work" story the brief describes, just read top-to-bottom
  * (current, most-detailed role first) rather than left-to-right — the conventional,
  * expected reading order for a portfolio's experience list.
+ *
+ * Progressive disclosure (Phase 9.6 Parts 3-4): the collapsed card shows role, org,
+ * dates, `summary` (1-2 sentences), one `impact` line, and `tech` — the full
+ * `highlights` bullet list moved behind a native `<details>`/`<summary>` ("View full
+ * experience"), revealing `expanded`'s readable, headed groups when present (falling
+ * back to plain `highlights` for a role that doesn't have one). Native `<details>`
+ * needs no client JS, no accordion dependency, and toggles instantly with no
+ * animation to gate under reduced-motion — see disclosure.css.
+ * expected reading order for a portfolio's experience list.
  */
 export function ExperienceThread({ roles }: ExperienceThreadProps) {
   return (
@@ -58,15 +67,6 @@ export function ExperienceThread({ roles }: ExperienceThreadProps) {
 
                   <p className="mt-4 text-sm leading-relaxed text-foreground text-pretty">{role.summary}</p>
 
-                  <ul className="mt-4 space-y-2">
-                    {role.highlights.map((highlight, j) => (
-                      <li key={j} className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground">
-                        <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 rounded-full bg-border" />
-                        <span className="text-pretty">{highlight}</span>
-                      </li>
-                    ))}
-                  </ul>
-
                   {role.impact && (
                     <p className="mt-4 font-mono text-label text-muted">{role.impact}</p>
                   )}
@@ -78,6 +78,43 @@ export function ExperienceThread({ roles }: ExperienceThreadProps) {
                       ))}
                     </div>
                   )}
+
+                  <details className="mt-5 border-t border-border-subtle pt-4">
+                    <summary className="disclosure__summary focus-ring inline-flex items-center gap-1.5 font-mono text-label text-muted underline decoration-border decoration-1 underline-offset-4 hover:text-foreground hover:decoration-accent">
+                      <span className="disclosure__summary-closed">View full experience</span>
+                      <span className="disclosure__summary-open">Show less</span>
+                      <svg aria-hidden="true" className="disclosure__chevron" width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </summary>
+
+                    <div className="mt-4 space-y-5">
+                      {role.expanded && role.expanded.length > 0
+                        ? role.expanded.map((group) => (
+                            <div key={group.heading}>
+                              <h4 className="font-mono text-label text-muted uppercase tracking-wide">{group.heading}</h4>
+                              <ul className="mt-2 space-y-2">
+                                {group.items.map((item, j) => (
+                                  <li key={j} className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground">
+                                    <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 rounded-full bg-border" />
+                                    <span className="text-pretty">{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))
+                        : (
+                            <ul className="space-y-2">
+                              {role.highlights.map((highlight, j) => (
+                                <li key={j} className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground">
+                                  <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 rounded-full bg-border" />
+                                  <span className="text-pretty">{highlight}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                    </div>
+                  </details>
                 </Surface>
               </article>
             </Reveal>

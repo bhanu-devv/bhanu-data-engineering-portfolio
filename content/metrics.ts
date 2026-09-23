@@ -7,6 +7,19 @@ import type { Metric } from "@/types/content";
  */
 export const metrics: Metric[] = [
   {
+    // Phase 9.6 Part 1: the Hero proof strip's first item, combining the two scope
+    // facts below into one compound value ("20+ campus buildings · 170+ monthly
+    // bill-related items") under a label naming the platform itself. A scope/scale
+    // statement, not a completion claim — the project's own status badge (Current
+    // Build) is what says whether it's finished, not this metric.
+    id: "azure-platform-scope",
+    value: "20+ campus buildings · 170+ monthly bill-related items",
+    label: "Azure Utility Data Platform",
+    context:
+      "Billing, meter, usage, cost, and operational data in scope across 20+ campus buildings and 170+ monthly bill-related items.",
+    source: "Resume: Professional Summary; Data Analyst – Utilities Department",
+  },
+  {
     id: "campus-buildings",
     value: "20+",
     label: "Campus buildings",

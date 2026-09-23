@@ -1,0 +1,55 @@
+/**
+ * Inline progressive disclosure (Phase 9.6 Parts 3-9): native `<details>`/`<summary>`
+ * for Experience and Leadership's "View full experience" / "View leadership details"
+ * — no client JS, no accordion dependency (CLAUDE.md §7's "prefer the platform").
+ * Native `<details>` already toggles instantly with no animation, which is exactly
+ * what Part 22 asks for ("no excessive height animation") and makes reduced-motion
+ * compliance (Part 22/9's "immediate content-state changes") automatic rather than
+ * something to gate — there is no motion to gate in the first place. Only the
+ * disclosure trigger's own default marker is replaced with the site's own visual
+ * language; nothing here animates height, opacity, or transform.
+ */
+
+.disclosure__summary {
+  list-style: none; /* remove the default marker so the site's own label/chevron can take over */
+  cursor: pointer;
+}
+
+.disclosure__summary::-webkit-details-marker {
+  display: none; /* Safari/Chrome's own marker */
+}
+
+.disclosure__summary-open {
+  display: none;
+}
+
+details[open] > .disclosure__summary .disclosure__summary-open {
+  display: inline;
+}
+
+details[open] > .disclosure__summary .disclosure__summary-closed {
+  display: none;
+}
+
+.disclosure__chevron {
+  transition: transform var(--motion-duration-fast) var(--motion-ease); /* transform only — CLAUDE.md §5 budget rule 1 */
+}
+
+details[open] > .disclosure__summary .disclosure__chevron {
+  transform: rotate(180deg);
+}
+
+/* General-purpose pair for content elsewhere in a <details> tree that should swap
+   with open/closed state (e.g. Recommendations' short excerpt vs. full quote) —
+   distinct from the two above, which are scoped to text inside <summary> itself. */
+.disclosure__open-only {
+  display: none;
+}
+
+details[open] .disclosure__open-only {
+  display: block;
+}
+
+details[open] .disclosure__closed-only {
+  display: none;
+}

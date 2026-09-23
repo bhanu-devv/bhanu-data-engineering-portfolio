@@ -4,6 +4,7 @@ import { Surface } from "@/components/ui/Surface";
 import { Reveal } from "@/components/ui/Reveal";
 import { Node } from "@/components/web/Node";
 import { certifications } from "@/lib/content";
+import { formatYearMonth } from "@/lib/format-date";
 import { uiStrings } from "@/lib/ui-strings";
 import type { Certification } from "@/types/content";
 
@@ -20,11 +21,12 @@ const KIND_LABEL: Record<NonNullable<Certification["kind"]> | "credential", stri
 
 /**
  * The Certifications section (Phase 7): smaller, quieter "credential nodes" than
- * Skills' hub cards (Step 15) — grayscale surfaces, issuer as quiet metadata, no
- * vendor logos or brand colors. Every `verifyUrl` is currently absent on the real
- * site (none of the 5 credentials has an approved public verification URL yet), so no
- * "Verify credential" action renders anywhere on the live site — self-hiding per
- * record, never a disabled or fake link.
+ * Skills' hub cards (Step 15) — grayscale surfaces, issuer/dates as quiet metadata, no
+ * vendor logos or brand colors. `verifyUrl` (Phase 9.6: both Oracle credentials now
+ * have an official verification URL) renders "Verify credential"; the other three
+ * credentials still have none, so they self-hide the action per record, never a
+ * disabled or fake link. The credential ID itself is intentionally never rendered —
+ * the verification link is what matters, not a long ID string (Part 16).
  */
 export function Certifications() {
   return (
@@ -50,6 +52,15 @@ export function Certifications() {
               </div>
               <h3 className="mt-3 font-display text-lede text-foreground text-balance">{cert.name}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{cert.issuer}</p>
+              {(cert.issued || cert.expires) && (
+                // Quiet metadata (Phase 9.6 Part 16) — the credential ID itself stays
+                // unrendered by design; a verification link matters more than a long ID.
+                <p className="mt-1 font-mono text-label text-muted">
+                  {cert.issued && `Issued ${formatYearMonth(cert.issued)}`}
+                  {cert.issued && cert.expires && " · "}
+                  {cert.expires && `Expires ${formatYearMonth(cert.expires)}`}
+                </p>
+              )}
               {cert.verifyUrl && (
                 <a
                   href={cert.verifyUrl}

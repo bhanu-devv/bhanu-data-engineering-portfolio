@@ -119,6 +119,11 @@ export const projects: Project[] = [
       ],
     },
     metricIds: ["energy-star-records", "energy-star-prep"],
+    // Confirmed by Bhanu (Phase 9.6, LinkedIn-supported): a privacy-safe/anonymized
+    // public version of this project's code. Every existing project-privacy rule
+    // (PLANNING.md §9.4) still applies to what the repository itself may contain —
+    // this URL just links out to it, it doesn't change what's published here.
+    links: { github: "https://github.com/bhanu-devv/csu-energystar-automation" },
     featured: true,
   },
   {
