@@ -1,4 +1,3 @@
-import { needsInput } from "@/lib/needs-input";
 import type { Site } from "@/types/content";
 
 /**
@@ -32,7 +31,10 @@ export const site: Site = {
     title: "Bhanudeepak Nagumothu | Data Engineer",
     description:
       "Bhanudeepak Nagumothu, Data Engineer building reliable cloud data platforms, pipelines, and automation that turn operational data into trusted systems.",
-    url: needsInput("Canonical site URL (known once a domain is chosen)"),
+    // The actual Vercel production alias, captured from the real deployment (not a
+    // custom domain — none is configured yet). Change this one value if a custom
+    // domain is added later; every canonical/OG/JSON-LD/robots/sitemap URL follows it.
+    url: "https://bhanu-data-engineering-portfolio.vercel.app",
   },
 
   portrait: {

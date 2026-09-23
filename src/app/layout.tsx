@@ -3,19 +3,20 @@ import { fontVariables } from "@/app/fonts";
 import { SkipLink } from "@/components/ui/SkipLink";
 import { PersonJsonLd } from "@/components/seo/PersonJsonLd";
 import { site } from "@/lib/content";
+import { getSiteUrl } from "@/lib/content-selectors";
 import "./globals.css";
 
+const siteUrl = getSiteUrl();
+
 /**
- * Production metadata (Phase 9 Step 8). Deliberately has NO `metadataBase` and NO
- * `openGraph.url`/`alternates.canonical`: the production domain is still unresolved
- * (PLANNING.md §14.2 item 11), and CLAUDE.md's "never invent" rule applies to URLs
- * exactly as it does to any other fact — inventing a Vercel URL or a placeholder
- * domain now would have to be silently swapped out later. Next.js falls back to
- * `http://localhost:3000` for any OG/Twitter image URL resolution in the meantime
- * (a build-time warning, not a runtime error) — expected and documented here, not a
- * bug. Revisit this whole block once a domain exists (Phase 11).
+ * Production metadata (Phase 9 Step 8; production URL wired Phase 11). `metadataBase`,
+ * the canonical link, and `openGraph.url` all derive from `site.seo.url` via
+ * `getSiteUrl()` — the real Vercel production alias — and are omitted entirely when
+ * that value is still `needsInput()` (as in `content.example/`), never replaced with
+ * an invented or localhost URL.
  */
 export const metadata: Metadata = {
+  ...(siteUrl && { metadataBase: new URL(siteUrl), alternates: { canonical: "/" } }),
   title: {
     default: site.seo.title,
     template: `%s | ${site.name.full}`,
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   openGraph: {
     type: "profile",
+    ...(siteUrl && { url: "/" }),
     title: site.seo.title,
     description: site.seo.description,
     siteName: site.seo.title,

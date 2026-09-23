@@ -19,8 +19,21 @@ import {
   awards,
   navigation,
   metrics,
+  site,
 } from "@/lib/content";
+import { resolve } from "@/lib/needs-input";
 import type { Metric, NavSection, Project, Recommendation, Social } from "@/types/content";
+
+/**
+ * The canonical production origin (no trailing slash), or `undefined` while
+ * `site.seo.url` is still `needsInput()` — as it is in `content.example/`. The one
+ * place every absolute-URL consumer (metadataBase, canonical, Open Graph, JSON-LD,
+ * robots, sitemap) reads from, so each can omit its URL field cleanly instead of
+ * inventing one.
+ */
+export function getSiteUrl(): string | undefined {
+  return resolve(site.seo.url)?.replace(/\/+$/, "");
+}
 
 /** Only recommendations Bhanu has explicitly approved for publishing (CLAUDE.md §2 rule 5). */
 export function getApprovedRecommendations(): Recommendation[] {
